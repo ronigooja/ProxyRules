@@ -1,0 +1,75 @@
+# NAME: ChinaAI
+# 国内大模型 AI 服务直连规则
+# Shadowrocket / Clash compatible
+
+# ===== DeepSeek =====
+DOMAIN-SUFFIX,deepseek.com,DIRECT
+
+# ===== Kimi 月之暗面 =====
+DOMAIN-SUFFIX,moonshot.cn,DIRECT
+DOMAIN-SUFFIX,kimi.moonshot.cn,DIRECT
+
+# ===== 智谱 GLM =====
+DOMAIN-SUFFIX,zhipuai.cn,DIRECT
+DOMAIN-SUFFIX,chatglm.cn,DIRECT
+DOMAIN-SUFFIX,bigmodel.cn,DIRECT
+
+# ===== 阿里通义千问 DashScope =====
+DOMAIN-SUFFIX,dashscope.aliyuncs.com,DIRECT
+DOMAIN-SUFFIX,aliyuncs.com,DIRECT
+DOMAIN-SUFFIX,qianwen.com,DIRECT
+
+# ===== 字节豆包 =====
+DOMAIN-SUFFIX,doubao.com,DIRECT
+DOMAIN-SUFFIX,volcengine.com,DIRECT
+DOMAIN-SUFFIX,volces.com,DIRECT
+
+# ===== 百度文心一言 =====
+DOMAIN-SUFFIX,yiyan.baidu.com,DIRECT
+DOMAIN-SUFFIX,ernie.baidu.com,DIRECT
+DOMAIN-SUFFIX,baidu.com,DIRECT
+
+# ===== 腾讯混元 =====
+DOMAIN-SUFFIX,hunyuan.tencent.com,DIRECT
+DOMAIN-SUFFIX,tencentcloudapi.com,DIRECT
+DOMAIN-SUFFIX,tencent.com,DIRECT
+
+# ===== 科大讯飞星火 =====
+DOMAIN-SUFFIX,xfyun.cn,DIRECT
+DOMAIN-SUFFIX,iflytek.com,DIRECT
+
+# ===== MiniMax =====
+DOMAIN-SUFFIX,minimaxi.com,DIRECT
+DOMAIN-SUFFIX,hailuoai.com,DIRECT
+
+# ===== 百川智能 =====
+DOMAIN-SUFFIX,baichuan-ai.com,DIRECT
+DOMAIN-SUFFIX,baichuan-inc.com,DIRECT
+
+# ===== 阶跃星辰 StepFun =====
+DOMAIN-SUFFIX,stepfun.com,DIRECT
+DOMAIN-SUFFIX,stepai.cn,DIRECT
+
+# ===== 商汤 SenseChat =====
+DOMAIN-SUFFIX,sensetime.com,DIRECT
+DOMAIN-SUFFIX,sensecore.cn,DIRECT
+
+# ===== 华为盘古 =====
+DOMAIN-SUFFIX,huaweicloud.com,DIRECT
+DOMAIN-SUFFIX,mindspore.cn,DIRECT
+
+# ===== 360智脑 =====
+DOMAIN-SUFFIX,360.cn,DIRECT
+DOMAIN-SUFFIX,so.com,DIRECT
+
+# ===== 京东言犀 =====
+DOMAIN-SUFFIX,jd.com,DIRECT
+
+# ===== 网易有道 =====
+DOMAIN-SUFFIX,youdao.com,DIRECT
+
+# ===== 搭建AI应用常见国内API =====
+DOMAIN-SUFFIX,aliyuncs.com,DIRECT
+DOMAIN-SUFFIX,volcengineapi.com,DIRECT
+DOMAIN-SUFFIX,tencentcloud.com,DIRECT
+DOMAIN-SUFFIX,huaweicloud.com,DIRECT
