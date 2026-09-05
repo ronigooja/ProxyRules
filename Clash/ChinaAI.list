@@ -18,6 +18,7 @@ DOMAIN-SUFFIX,bigmodel.cn,DIRECT
 DOMAIN-SUFFIX,dashscope.aliyuncs.com,DIRECT
 DOMAIN-SUFFIX,aliyuncs.com,DIRECT
 DOMAIN-SUFFIX,qianwen.com,DIRECT
+DOMAIN-SUFFIX,qianwenai.com,DIRECT
 
 # ===== 字节豆包 =====
 DOMAIN-SUFFIX,doubao.com,DIRECT
