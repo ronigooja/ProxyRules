@@ -74,3 +74,6 @@ DOMAIN-SUFFIX,aliyuncs.com,DIRECT
 DOMAIN-SUFFIX,volcengineapi.com,DIRECT
 DOMAIN-SUFFIX,tencentcloud.com,DIRECT
 DOMAIN-SUFFIX,huaweicloud.com,DIRECT
+
+# ===== 指定 IP 直连 =====
+IP-CIDR,154.19.184.2/32,DIRECT
