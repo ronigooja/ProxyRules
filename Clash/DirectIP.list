@@ -1,0 +1,5 @@
+# NAME: DirectIP
+# 指定 IP 直连规则
+# Shadowrocket / Clash compatible
+
+IP-CIDR,154.19.184.2/32,DIRECT
