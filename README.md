@@ -1,8 +1,8 @@
 # ProxyRules
 
-仓库中的 Shadowrocket 配置会从上游地址自动同步，并在 `[Rule]` 段最前面加入本仓库的 `Rules/ChinaAI.list` 和 `Rules/DirectIP.list` 规则。
+仓库中的 Shadowrocket 配置会从上游地址自动同步，并在 `[Rule]` 段最前面以 `RULE-SET` 形式引用本仓库的 `Rules/ChinaAI.list` 和 `Rules/DirectIP.list`。
 
-`Rules/` 存放带 `DIRECT` 策略的共用内联规则。若用于 Clash/Mihomo，请将规则加入配置的 `rules` 段；它们不是可直接作为 rule-provider 引用的列表。
+`Rules/` 是不带策略字段的规则集，由配置中的 `RULE-SET` 统一指定为 `DIRECT`。规则集地址使用 GitHub Raw，因此 Shadowrocket 会额外下载它们。
 
 生成文件：[Shadowrocket/nodnsleak-pk.ini](Shadowrocket/nodnsleak-pk.ini)。推送到 `main` 后，可在 Shadowrocket 中使用下面的远程配置地址：
 

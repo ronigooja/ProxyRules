@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fetch the upstream Shadowrocket profile and add this repository's rules."""
+"""Fetch the upstream Shadowrocket profile and add this repository's rule sets."""
 
 from pathlib import Path
 from urllib.request import Request, urlopen
@@ -9,20 +9,16 @@ ROOT = Path(__file__).resolve().parents[1]
 UPSTREAM_URL = "https://cf.buliang0.cf/shadowrocket-rules/nodnsleak-pk.ini"
 OUTPUT = ROOT / "Shadowrocket" / "nodnsleak-pk.ini"
 LOCAL_RULE_FILES = (ROOT / "Rules" / "ChinaAI.list", ROOT / "Rules" / "DirectIP.list")
-BEGIN = "# >>> ProxyRules local rules >>>"
-END = "# <<< ProxyRules local rules <<<"
+RAW_BASE_URL = "https://raw.githubusercontent.com/ronigooja/ProxyRules/main/Rules"
 
 
-def local_rules() -> str:
-    lines = [BEGIN]
+def local_rules() -> list[str]:
     for path in LOCAL_RULE_FILES:
-        lines.append(f"# Source: {path.relative_to(ROOT)}")
-        for line in path.read_text(encoding="utf-8").splitlines():
-            if line.strip() and not line.lstrip().startswith("#"):
-                lines.append(line)
-        lines.append("")
-    lines.append(END)
-    return "\n".join(lines)
+        if not path.is_file():
+            raise FileNotFoundError(path)
+    return ["# ProxyRules local rule sets"] + [
+        f"RULE-SET,{RAW_BASE_URL}/{path.name},DIRECT" for path in LOCAL_RULE_FILES
+    ]
 
 
 def merge(upstream: str) -> str:
@@ -33,7 +29,7 @@ def merge(upstream: str) -> str:
         raise ValueError("upstream profile does not contain a [Rule] section") from exc
 
     # The local block is placed first so the repository's explicit rules win.
-    block = local_rules().splitlines()
+    block = local_rules()
     merged = lines[: rule_header + 1] + [""] + block + [""] + lines[rule_header + 1 :]
     return "\n".join(merged).rstrip() + "\n"
 
