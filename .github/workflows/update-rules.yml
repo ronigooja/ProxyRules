@@ -1,0 +1,62 @@
+name: Update rules and XBoard templates
+
+on:
+  schedule:
+    - cron: "17 3 1 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install YAML validator
+        run: python3 -m pip install 'PyYAML==6.0.2'
+      - name: Generate and validate rules
+        run: |
+          python3 scripts/build_rules.py
+          python3 scripts/validate_outputs.py
+      - name: Publish generated templates for XBoard jobs
+        uses: actions/upload-artifact@v4
+        with:
+          name: xboard-templates
+          path: XBoard/
+          if-no-files-found: error
+      - name: Commit generated rules and templates
+        run: |
+          git add Rules/Personal.clash.yaml Upstream/ACL4SSR-REVISION XBoard/ Shadowrocket/nodnsleak-pk.ini
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Update ACL4SSR rules and XBoard templates"
+          git push
+
+  publish:
+    needs: generate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        environment:
+          - xboarddev.nodemgr.uk
+          - my.surabbit.com
+    environment: ${{ matrix.environment }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: xboard-templates
+          path: XBoard/
+      - name: Update XBoard subscription templates
+        env:
+          XBOARD_API_URL: ${{ vars.XBOARD_API_URL }}
+          XBOARD_ADMIN_PATH: ${{ vars.XBOARD_ADMIN_PATH }}
+          XBOARD_ADMIN_TOKEN: ${{ secrets.XBOARD_ADMIN_TOKEN }}
+        run: python3 scripts/publish_xboard.py

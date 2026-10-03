@@ -1,6 +1,7 @@
-# NAME: DirectIP
+# NAME: Personal
+# 独立个人直连规则；不并入 XBoard 基础模板。
+
 # 指定 IP 直连规则
-# Shadowrocket RULE-SET entries
 
 IP-CIDR,154.19.187.117/32,no-resolve
 IP-CIDR,45.45.217.235/32,no-resolve

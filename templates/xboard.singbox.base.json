@@ -1,0 +1,36 @@
+{
+  "dns": {
+    "servers": [
+      {"tag": "local", "type": "https", "server": "223.5.5.5", "detour": "direct"},
+      {"tag": "remote", "type": "https", "server": "1.1.1.1", "detour": "节点选择"}
+    ],
+    "rules": [
+      {"clash_mode": "direct", "server": "local"},
+      {"clash_mode": "global", "server": "remote"},
+      {"rule_set": ["geosite-cn"], "server": "local"}
+    ],
+    "final": "remote"
+  },
+  "inbounds": [
+    {"type": "mixed", "tag": "mixed-in", "listen": "127.0.0.1", "listen_port": 2334},
+    {"type": "tun", "tag": "tun-in", "interface_name": "sing-box", "address": ["172.19.0.1/30"], "auto_route": true}
+  ],
+  "outbounds": [
+    {"type": "selector", "tag": "节点选择", "outbounds": ["自动选择", "direct"], "default": "自动选择"},
+    {"type": "urltest", "tag": "自动选择", "outbounds": []},
+    {"type": "direct", "tag": "direct"},
+    {"type": "block", "tag": "block"}
+  ],
+  "route": {
+    "auto_detect_interface": true,
+    "rules": [
+      {"protocol": "dns", "action": "hijack-dns"},
+      {"clash_mode": "direct", "outbound": "direct"},
+      {"clash_mode": "global", "outbound": "节点选择"}
+    ],
+    "rule_set": [
+      {"tag": "geosite-cn", "type": "remote", "format": "binary", "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-cn.srs", "download_detour": "节点选择"},
+      {"tag": "geoip-cn", "type": "remote", "format": "binary", "url": "https://raw.githubusercontent.com/SagerNet/sing-geoip/rule-set/geoip-cn.srs", "download_detour": "节点选择"}
+    ]
+  }
+}

@@ -1,19 +1,37 @@
 # ProxyRules
 
-仓库中的 Shadowrocket 配置会从上游地址自动同步，并在 `[Rule]` 段最前面以 `RULE-SET` 形式引用本仓库的 `Rules/ChinaAI.list` 和 `Rules/DirectIP.list`。
+ACL4SSR 的 `Online Mini` 是基础规则上游。[Rules/Custom.list](Rules/Custom.list) 收录原 `ChinaAI.list` 的国内 AI 直连规则，并入上游；支持 `DIRECT`、`REJECT`、`Proxy` 策略，插入位置在广告拦截规则之后、一般国内直连规则之前。生成脚本使用同一上游版本生成 XBoard 的 Sing-box、Clash、Clash Meta、Stash、Surge、Surfboard 模板和独立的 Shadowrocket 配置。XBoard 在响应用户订阅时自行填入该用户的节点。
 
-`Rules/` 是不带策略字段的规则集，由配置中的 `RULE-SET` 统一指定为 `DIRECT`。规则集地址使用 GitHub Raw，因此 Shadowrocket 会额外下载它们。
+## 独立规则链接
 
-生成文件：[Shadowrocket/nodnsleak-pk.ini](Shadowrocket/nodnsleak-pk.ini)。推送到 `main` 后，可在 Shadowrocket 中使用下面的远程配置地址：
+独立的个人规则在 [Rules/Personal.list](Rules/Personal.list)，收录原 `DirectIP.list` 的两个 IP 直连规则，不含策略字段，可作为客户端的补充规则集：
 
-```text
-https://raw.githubusercontent.com/ronigooja/ProxyRules/main/Shadowrocket/nodnsleak-pk.ini
-```
+- Surge、Shadowrocket：`https://raw.githubusercontent.com/ronigooja/ProxyRules/main/Rules/Personal.list`
+- Clash、Clash Meta（classical rule-provider）：`https://raw.githubusercontent.com/ronigooja/ProxyRules/main/Rules/Personal.clash.yaml`
 
-手动更新：
+Clash 文件由 `Rules/Personal.list` 生成，无需单独编辑。使用时为规则集指定 `DIRECT`。Shadowrocket 配置包含个人规则链接；XBoard 模板只合并 `Rules/Custom.list`，个人规则链接可按需补充。
+
+Shadowrocket 完整规则配置：`https://raw.githubusercontent.com/ronigooja/ProxyRules/main/Shadowrocket/nodnsleak-pk.ini`。其中不含节点，DNS 设置使用系统 DNS；实际 DNS 行为取决于设备和客户端设置。
+
+## XBoard 模板更新
+
+月度工作流在每月 1 日运行，也支持手动运行。生成阶段下载 ACL4SSR 同一 Git 提交的配置和规则，校验并提交生成结果；发布阶段调用 XBoard 已有的管理 API，更新六个订阅模板。生成文件位于 `XBoard/`，规则版本记录在 `Upstream/ACL4SSR-REVISION`。Clash Meta 和 Stash 使用与 Clash 相同的 YAML 规则；Sing-box 使用 JSON 路由规则；Surfboard 使用兼容的 Surge 式配置。
+
+为每个 XBoard 建立一个 GitHub Environment，并设置：
+
+| 类型 | 名称 | 值 |
+| --- | --- | --- |
+| Secret | `XBOARD_ADMIN_TOKEN` | 管理员登录响应 `auth_data` 中去掉 `Bearer ` 的令牌 |
+| Variable | `XBOARD_API_URL` | 站点 HTTPS 根地址，不带 `/api` 路径 |
+| Variable | `XBOARD_ADMIN_PATH` | 站点管理路径，单个路径段 |
+
+工作流当前使用 `xboarddev.nodemgr.uk` 和 `my.surabbit.com` 两个 Environment。若某个值缺失，该站点的发布任务会明确失败，不会尝试空令牌请求。站点模板只会在内容变化时更新；生成或校验失败时不会调用任何站点 API。
+
+本地生成与校验：
 
 ```sh
-python3 scripts/update_shadowrocket_rules.py
+python3 scripts/build_rules.py
+python3 scripts/validate_outputs.py
 ```
 
-GitHub Actions 每天自动运行，也可以在 Actions 页面手动运行 `Update Shadowrocket rules`。修改本仓库的规则文件并推送后，下一次同步会自动带入生成文件。首次使用前请确保仓库的 Actions 工作流拥有读写权限，以便自动提交更新。
+校验脚本需要 PyYAML。工作流会安装固定版本。独立规则链接和 XBoard 模板都来自仓库生成文件，部署新工作流后可在 Actions 页面手动运行一次，使站点模板与仓库版本一致。
