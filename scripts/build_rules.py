@@ -86,6 +86,22 @@ def singbox_rule(rule: str, policy: str) -> dict | None:
     }[policy]}
 
 
+def pack_singbox_rules(rules: list[dict]) -> list[dict]:
+    """Merge adjacent rules with the same matcher and outbound, preserving order."""
+    packed = []
+    for rule in rules:
+        fields = [key for key in rule if key not in ("outbound", "action")]
+        if (packed and len(fields) == 1 and isinstance(rule[fields[0]], list)
+                and packed[-1].get("outbound") == rule.get("outbound")
+                and packed[-1].get("action") == rule.get("action")
+                and set(packed[-1]) == set(rule)):
+            packed[-1][fields[0]].extend(rule[fields[0]])
+        else:
+            packed.append({key: value.copy() if isinstance(value, list) else value
+                           for key, value in rule.items()})
+    return packed
+
+
 def build() -> dict[Path, str]:
     personal_path = ROOT / "Rules/Personal.list"
     personal = read_rules(personal_path.read_text(encoding="utf-8"), str(personal_path))
@@ -171,7 +187,7 @@ def build() -> dict[Path, str]:
     surge_base = (ROOT / "templates/xboard.surge.base.conf").read_text(encoding="utf-8")
     surfboard_base = (ROOT / "templates/xboard.surfboard.base.conf").read_text(encoding="utf-8")
     singbox = json.loads((ROOT / "templates/xboard.singbox.base.json").read_text(encoding="utf-8"))
-    singbox["route"]["rules"].extend(singbox_rules)
+    singbox["route"]["rules"].extend(pack_singbox_rules(singbox_rules))
     singbox["route"]["final"] = "节点选择"
     shadow_base = (ROOT / "templates/shadowrocket.base.ini").read_text(encoding="utf-8")
     if shadow_base.count("{{RULES}}") != 1:

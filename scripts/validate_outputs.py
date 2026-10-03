@@ -41,12 +41,22 @@ for rule_set in (clash["rules"], stash["rules"]):
             assert rule_set.index("DOMAIN-SUFFIX,a.youdao.com,REJECT") < rule_set.index(rule) < rule_set.index("DOMAIN-SUFFIX,cn,DIRECT")
 route = singbox["route"]
 assert route["final"] == "节点选择"
-assert len(route["rules"]) > 1000
+assert route["default_domain_resolver"]["server"] == "local"
+flat_rules = []
+for rule in route["rules"]:
+    fields = [key for key in rule if key not in ("outbound", "action")]
+    if len(fields) == 1 and isinstance(rule[fields[0]], list):
+        for value in rule[fields[0]]:
+            flat_rules.append({**rule, fields[0]: [value]})
+    else:
+        flat_rules.append(rule)
+assert len(flat_rules) > 1000
+assert len(route["rules"]) < len(flat_rules) / 2
 assert {outbound["tag"] for outbound in singbox["outbounds"]} >= {"节点选择", "自动选择", "direct", "block"}
 for rule, policy in custom:
     converted = singbox_rule(rule, policy)
     if converted is not None:
-        assert converted in route["rules"]
+        assert converted in flat_rules
 assert "[Proxy]" in surge and "[Rule]" in surge
 assert surge.rstrip().endswith("FINAL,Proxy")
 assert "[Proxy]" in surfboard and "[Rule]" in surfboard
