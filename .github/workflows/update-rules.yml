@@ -16,6 +16,8 @@ jobs:
       - name: Install YAML validator
         run: python3 -m pip install 'PyYAML==6.0.2'
       - name: Generate and validate rules
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           python3 scripts/build_rules.py
           python3 scripts/validate_outputs.py

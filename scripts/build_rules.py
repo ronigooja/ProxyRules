@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 from urllib.request import Request, urlopen
 
@@ -25,7 +26,10 @@ RULE_TYPES = {
 
 
 def fetch(url: str) -> str:
-    request = Request(url, headers={"User-Agent": "ProxyRules monthly builder"})
+    headers = {"User-Agent": "ProxyRules monthly builder"}
+    if url.startswith("https://api.github.com/") and os.environ.get("GITHUB_TOKEN"):
+        headers["Authorization"] = f"Bearer {os.environ['GITHUB_TOKEN']}"
+    request = Request(url, headers=headers)
     with urlopen(request, timeout=60) as response:
         return response.read().decode("utf-8-sig")
 
