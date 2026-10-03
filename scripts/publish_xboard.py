@@ -23,6 +23,18 @@ TEMPLATES = {
 }
 
 
+def equivalent(key: str, existing: object, desired: str) -> bool:
+    if not isinstance(existing, str):
+        return False
+    if key == "subscribe_template_singbox":
+        try:
+            return json.loads(existing) == json.loads(desired)
+        except json.JSONDecodeError:
+            return False
+    # XBoard's TrimStrings middleware removes surrounding whitespace on save.
+    return existing.strip() == desired.strip()
+
+
 def required(name: str) -> str:
     value = os.environ.get(name, "").strip()
     if not value:
@@ -69,23 +81,18 @@ def main() -> None:
     current_templates = current["data"].get("subscribe_template")
     if not isinstance(current_templates, dict):
         raise RuntimeError("XBoard did not return subscription templates")
-    changed = {}
-    for key, value in payload.items():
-        existing = current_templates.get(key)
-        if key == "subscribe_template_singbox" and isinstance(existing, str):
-            try:
-                if json.loads(existing) == json.loads(value):
-                    continue
-            except json.JSONDecodeError:
-                pass
-        if existing != value:
-            changed[key] = value
+    changed = {key: value for key, value in payload.items()
+               if not equivalent(key, current_templates.get(key), value)}
     if not changed:
         print(f"{parsed.netloc}: subscription templates are current")
         return
     response = request(f"{endpoint}/save", token, changed)
     if response.get("data") is not True:
         raise RuntimeError("XBoard did not confirm template update")
+    saved = request(f"{endpoint}/fetch?key=subscribe_template", token)["data"].get("subscribe_template")
+    if not isinstance(saved, dict) or any(
+            not equivalent(key, saved.get(key), value) for key, value in payload.items()):
+        raise RuntimeError("XBoard template readback did not match generated files")
     print(f"{parsed.netloc}: updated {', '.join(changed)}")
 
 
