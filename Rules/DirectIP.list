@@ -2,5 +2,5 @@
 # 指定 IP 直连规则
 # Shadowrocket RULE-SET entries
 
-IP-CIDR,154.19.187.117/32
-IP-CIDR,45.45.217.235/32
+IP-CIDR,154.19.187.117/32,no-resolve
+IP-CIDR,45.45.217.235/32,no-resolve
