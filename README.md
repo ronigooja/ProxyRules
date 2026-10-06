@@ -11,7 +11,7 @@ ACL4SSR 的 `Online Mini` 是基础规则上游。[Rules/Custom.list](Rules/Cust
 
 Clash 文件由 `Rules/Personal.list` 生成，无需单独编辑。使用时为规则集指定 `DIRECT`。Shadowrocket 配置包含个人规则链接；XBoard 模板只合并 `Rules/Custom.list`，个人规则链接可按需补充。
 
-Shadowrocket 完整规则配置：`https://raw.githubusercontent.com/ronigooja/ProxyRules/main/Shadowrocket/nodnsleak-pk.ini`。其中不含节点，DNS 设置使用系统 DNS；实际 DNS 行为取决于设备和客户端设置。
+Shadowrocket 完整规则配置：`https://raw.githubusercontent.com/ronigooja/ProxyRules/main/Shadowrocket/nodnsleak-pk.ini`。其中不含节点，DNS 使用阿里 DoH，IPv6 已开启；实际 DNS 行为取决于设备和客户端设置。
 
 ## DNS 泄漏定义
 

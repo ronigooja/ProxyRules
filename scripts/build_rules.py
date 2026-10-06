@@ -102,6 +102,34 @@ def pack_singbox_rules(rules: list[dict]) -> list[dict]:
     return packed
 
 
+def singbox_dns_rules(rules: list[dict]) -> list[dict]:
+    """Mirror domain route policies in DNS server selection."""
+    dns_rules = []
+    proxy_dns_index = 0
+    for rule in rules:
+        matcher = {key: value for key, value in rule.items()
+                   if key in ("domain", "domain_suffix", "domain_keyword")}
+        if not matcher:
+            continue
+        outbound = rule.get("outbound")
+        if outbound == "direct":
+            server = "local"
+        else:
+            server = "remote" if proxy_dns_index % 2 == 0 else "remote-google"
+            proxy_dns_index += 1
+        dns_rules.append({**matcher, "server": server})
+    packed = []
+    for rule in dns_rules:
+        fields = [key for key in rule if key != "server"]
+        if (packed and len(fields) == 1 and packed[-1].get("server") == rule["server"]
+                and set(packed[-1]) == set(rule)):
+            packed[-1][fields[0]].extend(rule[fields[0]])
+        else:
+            packed.append({key: value.copy() if isinstance(value, list) else value
+                           for key, value in rule.items()})
+    return packed
+
+
 def build() -> dict[Path, str]:
     personal_path = ROOT / "Rules/Personal.list"
     personal = read_rules(personal_path.read_text(encoding="utf-8"), str(personal_path))
@@ -187,7 +215,9 @@ def build() -> dict[Path, str]:
     surge_base = (ROOT / "templates/xboard.surge.base.conf").read_text(encoding="utf-8")
     surfboard_base = (ROOT / "templates/xboard.surfboard.base.conf").read_text(encoding="utf-8")
     singbox = json.loads((ROOT / "templates/xboard.singbox.base.json").read_text(encoding="utf-8"))
-    singbox["route"]["rules"].extend(pack_singbox_rules(singbox_rules))
+    packed_singbox_rules = pack_singbox_rules(singbox_rules)
+    singbox["dns"]["rules"].extend(singbox_dns_rules(packed_singbox_rules))
+    singbox["route"]["rules"].extend(packed_singbox_rules)
     singbox["route"]["final"] = "节点选择"
     shadow_base = (ROOT / "templates/shadowrocket.base.ini").read_text(encoding="utf-8")
     if shadow_base.count("{{RULES}}") != 1:

@@ -1,19 +1,19 @@
 {
   "dns": {
     "servers": [
-      {"tag": "local", "type": "https", "server": "223.5.5.5", "detour": "direct"},
-      {"tag": "remote", "type": "https", "server": "1.1.1.1", "detour": "节点选择"}
+      {"tag": "local", "type": "https", "server": "dns.alidns.com", "detour": "direct"},
+      {"tag": "remote", "type": "https", "server": "dns.cloudflare.com", "detour": "节点选择"},
+      {"tag": "remote-google", "type": "https", "server": "dns.google", "detour": "节点选择"}
     ],
     "rules": [
       {"clash_mode": "direct", "server": "local"},
-      {"clash_mode": "global", "server": "remote"},
-      {"rule_set": ["geosite-cn"], "server": "local"}
+      {"clash_mode": "global", "server": "remote"}
     ],
     "final": "remote"
   },
   "inbounds": [
     {"type": "mixed", "tag": "mixed-in", "listen": "127.0.0.1", "listen_port": 2334},
-    {"type": "tun", "tag": "tun-in", "interface_name": "sing-box", "address": ["172.19.0.1/30"], "auto_route": true}
+    {"type": "tun", "tag": "tun-in", "interface_name": "sing-box", "address": ["172.19.0.1/30", "fdfe:dcba:9876::1/126"], "auto_route": true}
   ],
   "outbounds": [
     {"type": "selector", "tag": "节点选择", "outbounds": ["自动选择", "direct"], "default": "自动选择"},
