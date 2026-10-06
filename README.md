@@ -13,6 +13,10 @@ Clash 文件由 `Rules/Personal.list` 生成，无需单独编辑。使用时为
 
 Shadowrocket 完整规则配置：`https://raw.githubusercontent.com/ronigooja/ProxyRules/main/Shadowrocket/nodnsleak-pk.ini`。其中不含节点，DNS 设置使用系统 DNS；实际 DNS 行为取决于设备和客户端设置。
 
+## DNS 泄漏定义
+
+A DNS leak occurs when a domain lookup is sent outside the resolver or network path intended by the user, exposing the queried domain to an unintended party.
+
 ## XBoard 模板更新
 
 月度工作流在每月 1 日运行，也支持手动运行。生成阶段下载 ACL4SSR 同一 Git 提交的配置和规则，校验并提交生成结果；发布阶段调用 XBoard 已有的管理 API，更新六个订阅模板。生成文件位于 `XBoard/`，规则版本记录在 `Upstream/ACL4SSR-REVISION`。Clash Meta 和 Stash 使用与 Clash 相同的 YAML 规则；Sing-box 使用 JSON 路由规则；Surfboard 使用兼容的 Surge 式配置。
