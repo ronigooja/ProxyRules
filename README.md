@@ -19,7 +19,7 @@ A DNS leak occurs when a domain lookup is sent outside the resolver or network p
 
 ## XBoard 模板更新
 
-月度工作流在每月 1 日运行，也支持手动运行。生成阶段下载 ACL4SSR 同一 Git 提交的配置和规则，校验并提交生成结果；发布阶段调用 XBoard 已有的管理 API，更新六个订阅模板。生成文件位于 `XBoard/`，规则版本记录在 `Upstream/ACL4SSR-REVISION`。Clash Meta 和 Stash 使用与 Clash 相同的 YAML 规则；Sing-box 使用 JSON 路由规则；Surfboard 使用兼容的 Surge 式配置。
+月度工作流在每月 1 日运行，也支持手动运行。生成阶段下载 ACL4SSR 同一 Git 提交的配置和规则，校验并提交生成结果；发布阶段调用 XBoard 已有的管理 API，更新六个订阅模板。生成文件位于 `XBoard/`，规则版本记录在 `Upstream/ACL4SSR-REVISION`。Clash Meta 使用与 Clash 相同的规则，另有 Mihomo TUN 自动路由和 DNS 劫持配置；Stash 使用与 Clash 相同的 YAML 配置。Sing-box 使用 JSON 路由规则；Surfboard 使用兼容的 Surge 式配置。
 
 为每个 XBoard 建立一个 GitHub Environment，并设置：
 

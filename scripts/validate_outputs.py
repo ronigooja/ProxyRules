@@ -13,6 +13,7 @@ from build_rules import (DIRECT_GROUP, FINAL_GROUP, PROXY_GROUP, REJECT_GROUP,
 
 ROOT = Path(__file__).resolve().parents[1]
 clash = yaml.safe_load((ROOT / "XBoard/clash.yaml").read_text(encoding="utf-8"))
+clashmeta = yaml.safe_load((ROOT / "XBoard/clashmeta.yaml").read_text(encoding="utf-8"))
 stash = yaml.safe_load((ROOT / "XBoard/stash.yaml").read_text(encoding="utf-8"))
 singbox = json.loads((ROOT / "XBoard/singbox.json").read_text(encoding="utf-8"))
 personal = yaml.safe_load((ROOT / "Rules/Personal.clash.yaml").read_text(encoding="utf-8"))
@@ -36,6 +37,11 @@ assert groups[auto_group]["interval"] > 0
 assert groups[auto_group]["tolerance"] >= 0
 assert isinstance(clash.get("rules"), list) and len(clash["rules"]) > 1000
 assert stash == clash
+assert {key: value for key, value in clashmeta.items() if key != "tun"} == clash
+assert "enable" not in clashmeta["tun"]
+assert clashmeta["tun"]["auto-route"] is True
+assert clashmeta["tun"]["auto-detect-interface"] is True
+assert set(clashmeta["tun"]["dns-hijack"]) == {"any:53", "tcp://any:53"}
 assert clash["rules"][-1] == f"MATCH,{FINAL_GROUP}"
 assert any(rule.endswith(f",{REJECT_GROUP}") for rule in clash["rules"])
 assert clash["rules"].index(f"DOMAIN-SUFFIX,cn,{DIRECT_GROUP}") > next(

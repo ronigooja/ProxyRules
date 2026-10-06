@@ -289,6 +289,7 @@ def build() -> dict[Path, str]:
         raise ValueError("ACL4SSR configuration has no rejection rules")
 
     clash_base = (ROOT / "templates/xboard.clash.base.yaml").read_text(encoding="utf-8")
+    clashmeta_tun = (ROOT / "templates/xboard.clashmeta.tun.yaml").read_text(encoding="utf-8")
     surge_base = (ROOT / "templates/xboard.surge.base.conf").read_text(encoding="utf-8")
     surfboard_base = (ROOT / "templates/xboard.surfboard.base.conf").read_text(encoding="utf-8")
     for name, template in (("Clash", clash_base), ("Surge", surge_base),
@@ -308,6 +309,7 @@ def build() -> dict[Path, str]:
     clash = clash_base.replace("{{PROXY_GROUPS}}", "\n".join(
         "  - " + json.dumps(group, ensure_ascii=False) for group in clash_proxy_groups(groups))) + "\n".join(
         "  - " + json.dumps(rule, ensure_ascii=False) for rule in clash_rules) + "\n"
+    clashmeta = clashmeta_tun + clash
     surge = surge_base.replace("{{PROXY_GROUPS}}", surge_proxy_groups(groups)) + "\n".join(surge_rules) + "\n"
     surfboard = surfboard_base.replace("{{PROXY_GROUPS}}", surge_proxy_groups(groups)) + "\n".join(surfboard_rules) + "\n"
     shadow = shadow_base.replace("{{RULES}}", "\n".join(shadow_rules))
@@ -317,6 +319,7 @@ def build() -> dict[Path, str]:
     return {
         ROOT / "Upstream/ACL4SSR-REVISION": revision + "\n",
         ROOT / "XBoard/clash.yaml": clash,
+        ROOT / "XBoard/clashmeta.yaml": clashmeta,
         ROOT / "XBoard/singbox.json": json.dumps(singbox, ensure_ascii=False, indent=2) + "\n",
         ROOT / "XBoard/stash.yaml": clash,
         ROOT / "XBoard/surge.conf": surge,

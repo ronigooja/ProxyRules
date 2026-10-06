@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 TEMPLATES = {
     "subscribe_template_singbox": ROOT / "XBoard/singbox.json",
     "subscribe_template_clash": ROOT / "XBoard/clash.yaml",
-    "subscribe_template_clashmeta": ROOT / "XBoard/clash.yaml",
+    "subscribe_template_clashmeta": ROOT / "XBoard/clashmeta.yaml",
     "subscribe_template_stash": ROOT / "XBoard/stash.yaml",
     "subscribe_template_surge": ROOT / "XBoard/surge.conf",
     "subscribe_template_surfboard": ROOT / "XBoard/surfboard.conf",
