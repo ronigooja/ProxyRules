@@ -176,21 +176,17 @@ def pack_singbox_rules(rules: list[dict]) -> list[dict]:
 
 
 def singbox_dns_rules(rules: list[dict]) -> list[dict]:
-    """Mirror domain route policies in DNS server selection."""
+    """Keep only direct-domain exceptions; the DNS final is the remote server."""
     dns_rules = []
-    proxy_dns_index = 0
     for rule in rules:
         matcher = {key: value for key, value in rule.items()
                    if key in ("domain", "domain_suffix", "domain_keyword")}
         if not matcher:
             continue
         outbound = rule.get("outbound")
-        if outbound in ("direct", DIRECT_GROUP):
-            server = "local"
-        else:
-            server = "remote" if proxy_dns_index % 2 == 0 else "remote-google"
-            proxy_dns_index += 1
-        dns_rules.append({**matcher, "server": server})
+        if outbound not in ("direct", DIRECT_GROUP):
+            continue
+        dns_rules.append({**matcher, "server": "local"})
     packed = []
     for rule in dns_rules:
         fields = [key for key in rule if key != "server"]
