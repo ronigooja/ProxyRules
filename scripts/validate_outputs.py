@@ -7,7 +7,7 @@ from pathlib import Path
 
 import yaml
 sys.dont_write_bytecode = True
-from build_rules import (DIRECT_GROUP, FINAL_GROUP, PROXY_GROUP, REJECT_GROUP,
+from build_rules import (DIRECT_GROUP, FINAL_GROUP, PROXY_GROUP,
                          read_custom_rules, read_rules, singbox_rule)
 
 
@@ -27,12 +27,15 @@ personal_rules = read_rules(personal_list, "Rules/Personal.list")
 
 assert isinstance(clash.get("proxy-groups"), list)
 group_names = [group["name"] for group in clash["proxy-groups"]]
-assert set(group_names) >= {PROXY_GROUP, DIRECT_GROUP, REJECT_GROUP, FINAL_GROUP}
+assert set(group_names) >= {PROXY_GROUP, FINAL_GROUP}
+assert DIRECT_GROUP not in group_names and "🛑 全球拦截" not in group_names
 groups = {group["name"]: group for group in clash["proxy-groups"]}
-assert groups[PROXY_GROUP]["include-all"] is True
-assert groups[PROXY_GROUP]["proxies"][1] == "DIRECT"
+assert "DIRECT" in groups[PROXY_GROUP]["proxies"]
 auto_group = groups[PROXY_GROUP]["proxies"][0]
 assert groups[auto_group]["type"] == "url-test"
+assert groups[auto_group]["filter"] == "(?:.*)"
+assert set(group_names) >= {"💬 Ai平台", "🎥 奈飞视频", "🇭🇰 香港节点"}
+assert "Hong Kong" in groups["🇭🇰 香港节点"]["filter"]
 assert groups[auto_group]["interval"] > 0
 assert groups[auto_group]["tolerance"] >= 0
 assert isinstance(clash.get("rules"), list) and len(clash["rules"]) > 1000
@@ -43,9 +46,11 @@ assert clashmeta["tun"]["auto-route"] is True
 assert clashmeta["tun"]["auto-detect-interface"] is True
 assert set(clashmeta["tun"]["dns-hijack"]) == {"any:53", "tcp://any:53"}
 assert clash["rules"][-1] == f"MATCH,{FINAL_GROUP}"
-assert any(rule.endswith(f",{REJECT_GROUP}") for rule in clash["rules"])
-assert clash["rules"].index(f"DOMAIN-SUFFIX,cn,{DIRECT_GROUP}") > next(
-    i for i, rule in enumerate(clash["rules"]) if rule.endswith(f",{REJECT_GROUP}")
+block_policy = "🛑 广告拦截"
+app_policy = "🍃 应用净化"
+assert any(rule.endswith(f",{block_policy}") for rule in clash["rules"])
+assert clash["rules"].index("DOMAIN-SUFFIX,cn,DIRECT") > next(
+    i for i, rule in enumerate(clash["rules"]) if rule.endswith(f",{block_policy}")
 )
 assert isinstance(personal.get("payload"), list)
 assert len(personal["payload"]) == len(set(personal["payload"]))
@@ -54,7 +59,7 @@ for rule_set in (clash["rules"], stash["rules"]):
     for rule, _ in custom:
         if not rule.startswith("URL-REGEX,"):
             rendered = rule.replace(",Proxy", f",{PROXY_GROUP}")
-            assert rule_set.index(f"DOMAIN-SUFFIX,a.youdao.com,{REJECT_GROUP}") < rule_set.index(rendered) < rule_set.index(f"DOMAIN-SUFFIX,cn,{DIRECT_GROUP}")
+            assert rule_set.index(f"DOMAIN-SUFFIX,a.youdao.com,{app_policy}") < rule_set.index(rendered) < rule_set.index("DOMAIN-SUFFIX,cn,DIRECT")
 route = singbox["route"]
 assert route["final"] == FINAL_GROUP
 assert route["default_domain_resolver"]["server"] == "local"
@@ -70,7 +75,7 @@ assert len(flat_rules) > 1000
 assert len(route["rules"]) < len(flat_rules) / 2
 assert {outbound["tag"] for outbound in singbox["outbounds"]} == set(group_names) | {"direct", "block"}
 singbox_outbounds = {outbound["tag"]: outbound for outbound in singbox["outbounds"]}
-assert singbox_outbounds[PROXY_GROUP]["outbounds"] == [auto_group, "direct"]
+assert "direct" in singbox_outbounds[PROXY_GROUP]["outbounds"]
 assert singbox_outbounds[auto_group]["type"] == "urltest"
 for rule, policy in custom:
     converted = singbox_rule(rule, policy)
@@ -81,16 +86,16 @@ assert surge.rstrip().endswith(f"FINAL,{FINAL_GROUP}")
 assert "[Proxy]" in surfboard and "[Rule]" in surfboard
 assert surfboard.rstrip().endswith(f"FINAL,{FINAL_GROUP}")
 for content in (surge, surfboard):
-    assert f"{PROXY_GROUP} = select, {auto_group}, DIRECT, $proxy_group" in content
-    assert f"{FINAL_GROUP} = select, {PROXY_GROUP}, {DIRECT_GROUP}, {auto_group}, $proxy_group" in content
+    assert f"{PROXY_GROUP} = select, {auto_group}," in content
+    assert f"{FINAL_GROUP} = select, {PROXY_GROUP}," in content
+    assert f"{DIRECT_GROUP} =" not in content
 for content in (surge, surfboard, shadow):
     for rule, _ in custom:
         if content is surfboard and rule.startswith("URL-REGEX,"):
             continue
         rendered = rule.replace(",Proxy", ",PROXY" if content is shadow else f",{PROXY_GROUP}")
-        reject = "REJECT" if content is shadow else REJECT_GROUP
-        direct = "DIRECT" if content is shadow else DIRECT_GROUP
-        assert content.index(f"DOMAIN-SUFFIX,a.youdao.com,{reject}") < content.index(rendered) < content.index(f"DOMAIN-SUFFIX,cn,{direct}")
+        reject = "REJECT" if content is shadow else app_policy
+        assert content.index(f"DOMAIN-SUFFIX,a.youdao.com,{reject}") < content.index(rendered) < content.index("DOMAIN-SUFFIX,cn,DIRECT")
 assert "[Rule]" in shadow and "[Host]" in shadow
 assert "RULE-SET,https://raw.githubusercontent.com/ronigooja/ProxyRules/main/Rules/Personal.list,DIRECT" in shadow
 assert shadow.index("FINAL,PROXY") < shadow.index("[Host]")

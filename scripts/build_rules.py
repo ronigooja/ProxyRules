@@ -12,11 +12,12 @@ from urllib.request import Request, urlopen
 ROOT = Path(__file__).resolve().parents[1]
 ACL_RAW = "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR"
 ACL_API = "https://api.github.com/repos/ACL4SSR/ACL4SSR/commits/master"
-CONFIG = "Clash/config/ACL4SSR_Online_Mini.ini"
+CONFIG = "Clash/config/ACL4SSR_Online_Full.ini"
 PROXY_GROUP = "🚀 节点选择"
 DIRECT_GROUP = "🎯 全球直连"
 REJECT_GROUP = "🛑 全球拦截"
 FINAL_GROUP = "🐟 漏网之鱼"
+HIDDEN_GROUPS = {DIRECT_GROUP, REJECT_GROUP}
 RULE_TYPES = {
     "DOMAIN", "DOMAIN-SUFFIX", "DOMAIN-KEYWORD", "IP-CIDR", "IP-CIDR6",
     "PROCESS-NAME", "URL-REGEX",
@@ -94,11 +95,11 @@ def read_proxy_groups(config: str) -> list[dict]:
         if not name or name in {group["name"] for group in groups}:
             raise ValueError(f"invalid upstream proxy group: {line}")
         if kind == "select":
-            if not items or any(not item or (not item.startswith("[]") and item != ".*") for item in items):
+            if not items or any(not item for item in items):
                 raise ValueError(f"unsupported upstream proxy group: {line}")
             groups.append({"name": name, "type": kind, "items": items})
         elif kind == "url-test":
-            if len(items) != 3 or items[0] != ".*" or not items[1].startswith("http"):
+            if len(items) != 3 or not items[0] or not items[1].startswith("http"):
                 raise ValueError(f"unsupported upstream proxy group: {line}")
             timing = items[2].split(",")
             if len(timing) != 3 or not timing[0].isdigit() or timing[1] or not timing[2].isdigit():
@@ -108,7 +109,7 @@ def read_proxy_groups(config: str) -> list[dict]:
         else:
             raise ValueError(f"unsupported upstream proxy group: {line}")
     names = {group["name"] for group in groups}
-    if not {PROXY_GROUP, DIRECT_GROUP, REJECT_GROUP, FINAL_GROUP}.issubset(names):
+    if not {PROXY_GROUP, DIRECT_GROUP, FINAL_GROUP}.issubset(names):
         raise ValueError("upstream proxy groups are incomplete")
     for group in groups:
         for item in group["items"]:
@@ -117,13 +118,41 @@ def read_proxy_groups(config: str) -> list[dict]:
     return groups
 
 
+def policy_name(name: str, client: str = "clash") -> str:
+    if name in (DIRECT_GROUP, "DIRECT"):
+        return "direct" if client == "singbox" else "DIRECT"
+    if name in (REJECT_GROUP, "REJECT"):
+        return "block" if client == "singbox" else "REJECT"
+    return name
+
+
+def shadow_policy(name: str, groups: dict[str, dict], seen: frozenset[str] = frozenset()) -> str:
+    if name == DIRECT_GROUP or name == "DIRECT":
+        return "DIRECT"
+    if name == REJECT_GROUP or name == "REJECT":
+        return "REJECT"
+    if name in seen:
+        raise ValueError(f"cyclic default proxy group: {name}")
+    group = groups[name]
+    first = group["items"][0]
+    if not first.startswith("[]"):
+        return "PROXY"
+    return shadow_policy(first[2:], groups, seen | {name})
+
+
 def clash_proxy_groups(groups: list[dict]) -> list[dict]:
     result = []
     for group in groups:
+        if group["name"] in HIDDEN_GROUPS:
+            continue
         entry = {"name": group["name"], "type": group["type"],
-                 "proxies": [item[2:] for item in group["items"] if item.startswith("[]")]}
-        if ".*" in group["items"]:
-            entry.update({"include-all": True, "filter": ".*"})
+                 "proxies": [policy_name(item[2:]) for item in group["items"] if item.startswith("[]")]}
+        if group["type"] == "url-test":
+            patterns = [group["items"][0]]
+        else:
+            patterns = [item for item in group["items"] if not item.startswith("[]")]
+        if patterns:
+            entry.update({"include-all": True, "filter": "|".join(f"(?:{pattern})" for pattern in patterns)})
         if group["type"] == "url-test":
             entry.update({"url": group["items"][1], "interval": group["interval"],
                           "tolerance": group["tolerance"]})
@@ -134,8 +163,10 @@ def clash_proxy_groups(groups: list[dict]) -> list[dict]:
 def surge_proxy_groups(groups: list[dict]) -> str:
     lines = []
     for group in groups:
+        if group["name"] in HIDDEN_GROUPS:
+            continue
         if group["type"] == "select":
-            members = [item[2:] if item.startswith("[]") else "$proxy_group"
+            members = [policy_name(item[2:]) if item.startswith("[]") else "$proxy_group"
                        for item in group["items"]]
         else:
             members = ["$proxy_group", f"url={group['items'][1]}",
@@ -147,7 +178,9 @@ def surge_proxy_groups(groups: list[dict]) -> str:
 def singbox_proxy_groups(groups: list[dict]) -> list[dict]:
     outbounds = []
     for group in groups:
-        members = [{"DIRECT": "direct", "REJECT": "block"}.get(item[2:], item[2:])
+        if group["name"] in HIDDEN_GROUPS:
+            continue
+        members = [policy_name(item[2:], "singbox")
                    for item in group["items"] if item.startswith("[]")]
         outbound = {"type": "selector" if group["type"] == "select" else "urltest",
                     "tag": group["name"], "outbounds": members}
@@ -210,14 +243,14 @@ def build() -> dict[Path, str]:
     config = fetch(f"{ACL_RAW}/{revision}/{CONFIG}")
     groups = read_proxy_groups(config)
     group_names = {group["name"] for group in groups}
-    shadow_policies = {DIRECT_GROUP: "DIRECT", REJECT_GROUP: "REJECT",
-                       PROXY_GROUP: "PROXY", FINAL_GROUP: "PROXY"}
+    group_map = {group["name"]: group for group in groups}
+    shadow_policies = {name: shadow_policy(name, group_map) for name in group_names}
 
     clash_rules = []
     surge_rules = []
     surfboard_rules = []
     singbox_rules = []
-    shadow_rules = [f"# ACL4SSR Online Mini {revision[:12]}"]
+    shadow_rules = [f"# ACL4SSR Online Full {revision[:12]}"]
     source_count = 0
     personal_inserted = False
     for line in config.splitlines():
@@ -226,16 +259,16 @@ def build() -> dict[Path, str]:
         group, source = line[len("ruleset="):].split(",", 1)
         if group not in group_names:
             raise ValueError(f"unexpected upstream group: {group}")
-        policy = group
+        policy = policy_name(group)
         if source.startswith("[]"):
             inline = source[2:]
-            if inline == "GEOIP,CN" and policy == DIRECT_GROUP:
+            if inline == "GEOIP,CN" and group == DIRECT_GROUP:
                 clash_rules.append(f"GEOIP,CN,{policy}")
                 surge_rules.append(f"GEOIP,CN,{policy},no-resolve")
                 surfboard_rules.append(f"GEOIP,CN,{policy},no-resolve")
-                singbox_rules.append({"rule_set": ["geoip-cn"], "outbound": policy})
+                singbox_rules.append({"rule_set": ["geoip-cn"], "outbound": "direct"})
                 shadow_rules.append("GEOIP,CN,DIRECT,no-resolve")
-            elif inline == "FINAL" and policy == FINAL_GROUP:
+            elif inline == "FINAL" and group == FINAL_GROUP:
                 clash_rules.append(f"MATCH,{policy}")
                 surge_rules.append(f"FINAL,{policy}")
                 surfboard_rules.append(f"FINAL,{policy}")
@@ -258,8 +291,8 @@ def build() -> dict[Path, str]:
             if not rule.startswith("URL-REGEX,"):
                 surfboard_rules.append(transformed)
             surge_rules.append(transformed)
-            shadow_rules.append(with_policy(rule, shadow_policies[policy]))
-            converted = singbox_rule(rule, policy)
+            shadow_rules.append(with_policy(rule, shadow_policies[group]))
+            converted = singbox_rule(rule, policy_name(group, "singbox"))
             if converted is not None:
                 singbox_rules.append(converted)
         if relative == "BanProgramAD.list":
@@ -281,7 +314,7 @@ def build() -> dict[Path, str]:
 
     if source_count < 8 or not personal_inserted or clash_rules[-1] != f"MATCH,{FINAL_GROUP}":
         raise ValueError("ACL4SSR configuration is incomplete")
-    if not any(x.endswith(f",{REJECT_GROUP}") for x in clash_rules):
+    if not any(x.endswith(",🛑 广告拦截") for x in clash_rules):
         raise ValueError("ACL4SSR configuration has no rejection rules")
 
     clash_base = (ROOT / "templates/xboard.clash.base.yaml").read_text(encoding="utf-8")
