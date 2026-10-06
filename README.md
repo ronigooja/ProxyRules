@@ -15,13 +15,11 @@ Clash 文件由 `Rules/Personal.list` 生成，无需单独编辑。使用时为
 
 Shadowrocket 完整规则配置：`https://raw.githubusercontent.com/ronigooja/ProxyRules/main/Shadowrocket/nodnsleak-pk.ini`。其中不含节点，DNS 使用阿里 DoH，IPv6 已开启；实际 DNS 行为取决于设备和客户端设置。
 
-## DNS 泄漏定义
-
-A DNS leak occurs when a domain lookup is sent outside the resolver or network path intended by the user, exposing the queried domain to an unintended party.
+DNS 出口要求见 [AGENTS.md](AGENTS.md)。[Surfboard 官方配置文档](https://getsurfboard.com/docs/profile-format/general/doh_server)说明 DoH 查询目前默认直连，未提供指定 DoH 代理出口的配置项。因此 Surfboard 模板中的阿里 DoH 只覆盖直连侧，不能保证代理流量按本仓库要求经代理使用 Cloudflare／Google DoH。需要严格按此要求使用时，请选用 Clash Meta（Mihomo）配置，并在客户端自行启用所需的流量接管功能。
 
 ## XBoard 模板更新
 
-月度工作流在每月 1 日运行，也支持手动运行。生成阶段下载 ACL4SSR 同一 Git 提交的配置和规则，校验并提交生成结果；发布阶段调用 XBoard 已有的管理 API，更新六个订阅模板。生成文件位于 `XBoard/`，规则版本记录在 `Upstream/ACL4SSR-REVISION`。Clash Meta 使用与 Clash 相同的规则，另有 Mihomo TUN 自动路由和 DNS 劫持配置；Stash 使用与 Clash 相同的 YAML 配置。Sing-box 使用 JSON 路由规则；Surfboard 使用兼容的 Surge 式配置。
+月度工作流在每月 1 日运行，也支持手动运行。生成阶段下载 ACL4SSR 同一 Git 提交的配置和规则，校验并提交生成结果；发布阶段调用 XBoard 已有的管理 API，更新六个订阅模板。生成文件位于 `XBoard/`，规则版本记录在 `Upstream/ACL4SSR-REVISION`。Clash Meta 使用与 Clash 相同的规则，另有 Mihomo TUN 自动路由和 DNS 劫持配置；Stash 使用相同的分流规则和独立的 DNS 配置。Sing-box 使用 JSON 路由规则；Surfboard 使用兼容的 Surge 式配置。
 
 为每个 XBoard 建立一个 GitHub Environment，并设置：
 

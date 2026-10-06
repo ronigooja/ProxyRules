@@ -11,13 +11,13 @@
         "tag": "remote",
         "type": "https",
         "server": "dns.cloudflare.com",
-        "detour": "🚀 模式选择"
+        "detour": "♻️ 延迟优选"
       },
       {
         "tag": "remote-google",
         "type": "https",
         "server": "dns.google",
-        "detour": "🚀 模式选择"
+        "detour": "♻️ 延迟优选"
       }
     ],
     "rules": [

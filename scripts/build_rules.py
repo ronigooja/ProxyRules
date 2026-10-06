@@ -281,6 +281,53 @@ def singbox_dns_rules(rules: list[dict]) -> list[dict]:
     return packed
 
 
+def surge_dns_hosts(rules: list[str]) -> list[str]:
+    """Map explicit direct domains and earlier proxy exceptions to DoH."""
+    domain_rules = []
+    for rule in rules:
+        kind, value, *rest = rule.split(",")
+        if kind in ("DOMAIN", "DOMAIN-SUFFIX", "DOMAIN-KEYWORD") and rest:
+            domain_rules.append((kind, value.lower(), rest[0]))
+
+    direct_suffixes = [value for kind, value, policy in domain_rules
+                       if kind == "DOMAIN-SUFFIX" and policy == "DIRECT"]
+
+    def policy_for(domain: str) -> str | None:
+        for kind, value, policy in domain_rules:
+            if (kind == "DOMAIN" and domain == value
+                    or kind == "DOMAIN-SUFFIX" and (domain == value or domain.endswith("." + value))
+                    or kind == "DOMAIN-KEYWORD" and value in domain):
+                return policy
+        return None
+
+    hosts = []
+    seen = {"dns.cloudflare.com", "dns.google", "dns.alidns.com"}
+    for kind, value, policy in domain_rules:
+        if kind == "DOMAIN-KEYWORD":
+            continue
+        if policy == "DIRECT":
+            server = "https://dns.alidns.com/dns-query"
+        elif (policy not in ("REJECT", "🛑 广告拦截", "🍃 应用净化")
+              and any(
+                  value == suffix or value.endswith("." + suffix)
+                  for suffix in direct_suffixes)):
+            # These proxy rules precede broader direct suffixes such as .cn.
+            server = "https://dns.cloudflare.com/dns-query"
+        else:
+            continue
+        if policy == "DIRECT":
+            patterns = ([value] if policy_for(value) == "DIRECT" else [])
+            if kind == "DOMAIN-SUFFIX" and policy_for("dns-probe." + value) == "DIRECT":
+                patterns.append("*." + value)
+        else:
+            patterns = [value] if kind == "DOMAIN" else [value, "*." + value]
+        for pattern in patterns:
+            if pattern not in seen:
+                hosts.append(f"{pattern} = server:{server}")
+                seen.add(pattern)
+    return hosts
+
+
 def build() -> dict[Path, str]:
     personal_path = ROOT / "Rules/Personal.list"
     personal = read_rules(personal_path.read_text(encoding="utf-8"), str(personal_path))
@@ -369,12 +416,15 @@ def build() -> dict[Path, str]:
 
     clash_base = (ROOT / "templates/xboard.clash.base.yaml").read_text(encoding="utf-8")
     clashmeta_tun = (ROOT / "templates/xboard.clashmeta.tun.yaml").read_text(encoding="utf-8")
+    stash_base = (ROOT / "templates/xboard.stash.base.yaml").read_text(encoding="utf-8")
     surge_base = (ROOT / "templates/xboard.surge.base.conf").read_text(encoding="utf-8")
     surfboard_base = (ROOT / "templates/xboard.surfboard.base.conf").read_text(encoding="utf-8")
-    for name, template in (("Clash", clash_base), ("Surge", surge_base),
+    for name, template in (("Clash", clash_base), ("Stash", stash_base), ("Surge", surge_base),
                            ("Surfboard", surfboard_base)):
         if template.count("{{PROXY_GROUPS}}") != 1:
             raise ValueError(f"{name} base must contain one {{PROXY_GROUPS}} marker")
+    if surge_base.count("{{DNS_HOSTS}}") != 1:
+        raise ValueError("Surge base must contain one {DNS_HOSTS} marker")
     singbox = json.loads((ROOT / "templates/xboard.singbox.base.json").read_text(encoding="utf-8"))
     packed_singbox_rules = pack_singbox_rules(singbox_rules)
     singbox["dns"]["rules"].extend(singbox_dns_rules(packed_singbox_rules))
@@ -389,7 +439,16 @@ def build() -> dict[Path, str]:
         "  - " + json.dumps(group, ensure_ascii=False) for group in clash_proxy_groups(groups))) + "\n".join(
         "  - " + json.dumps(rule, ensure_ascii=False) for rule in clash_rules) + "\n"
     clashmeta = clashmeta_tun + clash
-    surge = surge_base.replace("{{PROXY_GROUPS}}", surge_proxy_groups(groups)) + "\n".join(surge_rules) + "\n"
+    stash = stash_base.replace("{{PROXY_GROUPS}}", "\n".join(
+        "  - " + json.dumps(group, ensure_ascii=False) for group in clash_proxy_groups(groups))) + "\n".join(
+        "  - " + json.dumps(rule, ensure_ascii=False) for rule in [
+            f"DOMAIN,dns.cloudflare.com,{AUTO_GROUP}",
+            f"DOMAIN,dns.google,{AUTO_GROUP}",
+            "DOMAIN,dns.alidns.com,DIRECT",
+        ] + clash_rules) + "\n"
+    surge = (surge_base.replace("{{PROXY_GROUPS}}", surge_proxy_groups(groups))
+             .replace("{{DNS_HOSTS}}", "\n".join(surge_dns_hosts(surge_rules)))
+             + "\n".join(surge_rules) + "\n")
     surfboard = surfboard_base.replace("{{PROXY_GROUPS}}", surge_proxy_groups(groups)) + "\n".join(surfboard_rules) + "\n"
     shadow = shadow_base.replace("{{RULES}}", "\n".join(shadow_rules))
     personal_clash = "payload:\n" + "\n".join(
@@ -400,7 +459,7 @@ def build() -> dict[Path, str]:
         ROOT / "XBoard/clash.yaml": clash,
         ROOT / "XBoard/clashmeta.yaml": clashmeta,
         ROOT / "XBoard/singbox.json": json.dumps(singbox, ensure_ascii=False, indent=2) + "\n",
-        ROOT / "XBoard/stash.yaml": clash,
+        ROOT / "XBoard/stash.yaml": stash,
         ROOT / "XBoard/surge.conf": surge,
         ROOT / "XBoard/surfboard.conf": surfboard,
         ROOT / "Shadowrocket/nodnsleak-pk.ini": shadow,

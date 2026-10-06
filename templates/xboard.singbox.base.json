@@ -2,8 +2,8 @@
   "dns": {
     "servers": [
       {"tag": "local", "type": "https", "server": "dns.alidns.com", "detour": "direct"},
-      {"tag": "remote", "type": "https", "server": "dns.cloudflare.com", "detour": "🚀 模式选择"},
-      {"tag": "remote-google", "type": "https", "server": "dns.google", "detour": "🚀 模式选择"}
+      {"tag": "remote", "type": "https", "server": "dns.cloudflare.com", "detour": "♻️ 延迟优选"},
+      {"tag": "remote-google", "type": "https", "server": "dns.google", "detour": "♻️ 延迟优选"}
     ],
     "rules": [
       {"clash_mode": "direct", "server": "local"},

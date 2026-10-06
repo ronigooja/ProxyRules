@@ -4,6 +4,7 @@
 import json
 import re
 import sys
+from fnmatch import fnmatchcase
 from pathlib import Path
 
 import yaml
@@ -52,12 +53,28 @@ assert all("include-all" not in group and "filter" not in group for group in gro
 assert groups[auto_group]["interval"] > 0
 assert groups[auto_group]["tolerance"] >= 0
 assert isinstance(clash.get("rules"), list) and len(clash["rules"]) > 1000
-assert stash == clash
+assert {key: value for key, value in stash.items() if key not in ("dns", "rules")} == {key: value for key, value in clash.items() if key not in ("dns", "rules")}
+assert stash["rules"][3:] == clash["rules"]
+assert stash["rules"][:3] == [
+    f"DOMAIN,dns.cloudflare.com,{AUTO_GROUP}",
+    f"DOMAIN,dns.google,{AUTO_GROUP}",
+    "DOMAIN,dns.alidns.com,DIRECT",
+]
 assert {key: value for key, value in clashmeta.items() if key != "tun"} == clash
 assert "enable" not in clashmeta["tun"]
 assert clashmeta["tun"]["auto-route"] is True
 assert clashmeta["tun"]["auto-detect-interface"] is True
 assert set(clashmeta["tun"]["dns-hijack"]) == {"any:53", "tcp://any:53"}
+dns = clash["dns"]
+assert dns == clashmeta["dns"]
+assert all(server.startswith("https://") for key in ("default-nameserver", "proxy-server-nameserver", "direct-nameserver", "nameserver", "fallback") for server in dns[key])
+assert all("dns.alidns.com" in server or "223.5.5.5" in server for server in dns["direct-nameserver"] + dns["proxy-server-nameserver"])
+assert all(server.endswith("#DIRECT") for server in dns["direct-nameserver"])
+assert all(("dns.cloudflare.com" in server or "dns.google" in server) and server.endswith("#" + AUTO_GROUP) for server in dns["nameserver"] + dns["fallback"])
+stash_dns = stash["dns"]
+assert stash_dns["follow-rule"] is True
+assert stash_dns["nameserver-policy"]["geosite:cn"] == "https://dns.alidns.com/dns-query"
+assert all(server.startswith("https://") for key in ("default-nameserver", "proxy-server-nameserver", "nameserver", "fallback") for server in stash_dns[key])
 assert clash["rules"][-1] == f"MATCH,{FINAL_GROUP}"
 block_policy = "🛑 广告拦截"
 app_policy = "🍃 应用净化"
@@ -76,6 +93,10 @@ for rule_set in (clash["rules"], stash["rules"]):
 route = singbox["route"]
 assert route["final"] == FINAL_GROUP
 assert route["default_domain_resolver"]["server"] == "local"
+dns_servers = {server["tag"]: server for server in singbox["dns"]["servers"]}
+assert dns_servers["local"]["server"] == "dns.alidns.com" and dns_servers["local"]["detour"] == "direct"
+assert dns_servers["remote"]["server"] == "dns.cloudflare.com" and dns_servers["remote"]["detour"] == AUTO_GROUP
+assert dns_servers["remote-google"]["server"] == "dns.google" and dns_servers["remote-google"]["detour"] == AUTO_GROUP
 flat_rules = []
 for rule in route["rules"]:
     fields = [key for key in rule if key not in ("outbound", "action")]
@@ -97,11 +118,33 @@ for rule, policy in custom:
         assert converted in flat_rules
 assert "[Proxy]" in surge and "[Rule]" in surge
 assert surge.rstrip().endswith(f"FINAL,{FINAL_GROUP}")
+assert "encrypted-dns-server = https://dns.cloudflare.com/dns-query, https://dns.google/dns-query" in surge
+assert "encrypted-dns-follow-outbound-mode = true" in surge
+assert "deepseek.com = server:https://dns.alidns.com/dns-query" in surge
+assert f"DOMAIN,dns.cloudflare.com,{AUTO_GROUP}" in surge
+assert f"DOMAIN,dns.google,{AUTO_GROUP}" in surge
+assert "DOMAIN,dns.alidns.com,DIRECT" in surge
+surge_hosts = [line.split(" = ", 1) for line in surge.split("[Host]\n", 1)[1]
+               .split("\n[Rule]", 1)[0].splitlines() if " = " in line]
+
+
+def surge_dns_server(domain: str) -> str:
+    for pattern, result in surge_hosts:
+        if fnmatchcase(domain, pattern):
+            return result
+    return "default"
+
+
+assert surge_dns_server("deepseek.com") == "server:https://dns.alidns.com/dns-query"
+assert surge_dns_server("alt1-mtalk.google.com") == "server:https://dns.cloudflare.com/dns-query"
+assert surge_dns_server("probe.alt1-mtalk.google.com") == "server:https://dns.alidns.com/dns-query"
 assert "[Proxy]" in surfboard and "[Rule]" in surfboard
 assert surfboard.rstrip().endswith(f"FINAL,{FINAL_GROUP}")
+assert "doh-server = https://dns.alidns.com/dns-query" in surfboard
+assert "dns-server =" not in surfboard
 for content in (surge, surfboard):
     displayed = [line.split(" = ", 1)[0] for line in content.split("[Proxy Group]\n", 1)[1]
-                 .split("\n[Rule]", 1)[0].splitlines() if " = " in line]
+                 .split("\n[Host]", 1)[0].splitlines() if " = " in line]
     assert displayed[:len(DISPLAY_FIRST)] == list(DISPLAY_FIRST)
     assert displayed[-1] == FINAL_GROUP
     assert f"{PROXY_GROUP} = select, {auto_group}," in content
