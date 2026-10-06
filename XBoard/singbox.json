@@ -11,13 +11,13 @@
         "tag": "remote",
         "type": "https",
         "server": "dns.cloudflare.com",
-        "detour": "🚀 节点选择"
+        "detour": "🚀 模式选择"
       },
       {
         "tag": "remote-google",
         "type": "https",
         "server": "dns.google",
-        "detour": "🚀 节点选择"
+        "detour": "🚀 模式选择"
       }
     ],
     "rules": [
@@ -898,9 +898,9 @@
   "outbounds": [
     {
       "type": "selector",
-      "tag": "🚀 节点选择",
+      "tag": "🚀 模式选择",
       "outbounds": [
-        "♻️ 自动选择",
+        "♻️ 延迟优选",
         "🇭🇰 香港节点",
         "🇨🇳 台湾节点",
         "🇸🇬 狮城节点",
@@ -912,13 +912,8 @@
       ]
     },
     {
-      "type": "selector",
-      "tag": "🚀 手动切换",
-      "outbounds": []
-    },
-    {
       "type": "urltest",
-      "tag": "♻️ 自动选择",
+      "tag": "♻️ 延迟优选",
       "outbounds": [],
       "url": "http://www.gstatic.com/generate_204",
       "interval": "300s",
@@ -926,10 +921,68 @@
     },
     {
       "type": "selector",
+      "tag": "🚀 手动切换",
+      "outbounds": []
+    },
+    {
+      "type": "urltest",
+      "tag": "🇭🇰 香港节点",
+      "outbounds": [],
+      "url": "http://www.gstatic.com/generate_204",
+      "interval": "300s",
+      "tolerance": 50
+    },
+    {
+      "type": "urltest",
+      "tag": "🇨🇳 台湾节点",
+      "outbounds": [],
+      "url": "http://www.gstatic.com/generate_204",
+      "interval": "300s",
+      "tolerance": 50
+    },
+    {
+      "type": "urltest",
+      "tag": "🇸🇬 狮城节点",
+      "outbounds": [],
+      "url": "http://www.gstatic.com/generate_204",
+      "interval": "300s",
+      "tolerance": 50
+    },
+    {
+      "type": "urltest",
+      "tag": "🇯🇵 日本节点",
+      "outbounds": [],
+      "url": "http://www.gstatic.com/generate_204",
+      "interval": "300s",
+      "tolerance": 50
+    },
+    {
+      "type": "urltest",
+      "tag": "🇺🇲 美国节点",
+      "outbounds": [],
+      "url": "http://www.gstatic.com/generate_204",
+      "interval": "300s",
+      "tolerance": 150
+    },
+    {
+      "type": "urltest",
+      "tag": "🇰🇷 韩国节点",
+      "outbounds": [],
+      "url": "http://www.gstatic.com/generate_204",
+      "interval": "300s",
+      "tolerance": 50
+    },
+    {
+      "type": "selector",
+      "tag": "🎥 奈飞节点",
+      "outbounds": []
+    },
+    {
+      "type": "selector",
       "tag": "📲 电报消息",
       "outbounds": [
-        "🚀 节点选择",
-        "♻️ 自动选择",
+        "🚀 模式选择",
+        "♻️ 延迟优选",
         "🇸🇬 狮城节点",
         "🇭🇰 香港节点",
         "🇨🇳 台湾节点",
@@ -944,8 +997,8 @@
       "type": "selector",
       "tag": "💬 Ai平台",
       "outbounds": [
-        "🚀 节点选择",
-        "♻️ 自动选择",
+        "🚀 模式选择",
+        "♻️ 延迟优选",
         "🇸🇬 狮城节点",
         "🇭🇰 香港节点",
         "🇨🇳 台湾节点",
@@ -960,8 +1013,8 @@
       "type": "selector",
       "tag": "📹 油管视频",
       "outbounds": [
-        "🚀 节点选择",
-        "♻️ 自动选择",
+        "🚀 模式选择",
+        "♻️ 延迟优选",
         "🇸🇬 狮城节点",
         "🇭🇰 香港节点",
         "🇨🇳 台湾节点",
@@ -977,8 +1030,8 @@
       "tag": "🎥 奈飞视频",
       "outbounds": [
         "🎥 奈飞节点",
-        "🚀 节点选择",
-        "♻️ 自动选择",
+        "🚀 模式选择",
+        "♻️ 延迟优选",
         "🇸🇬 狮城节点",
         "🇭🇰 香港节点",
         "🇨🇳 台湾节点",
@@ -994,7 +1047,7 @@
       "tag": "📺 巴哈姆特",
       "outbounds": [
         "🇨🇳 台湾节点",
-        "🚀 节点选择",
+        "🚀 模式选择",
         "🚀 手动切换",
         "direct"
       ]
@@ -1012,8 +1065,8 @@
       "type": "selector",
       "tag": "🌍 国外媒体",
       "outbounds": [
-        "🚀 节点选择",
-        "♻️ 自动选择",
+        "🚀 模式选择",
+        "♻️ 延迟优选",
         "🇭🇰 香港节点",
         "🇨🇳 台湾节点",
         "🇸🇬 狮城节点",
@@ -1041,7 +1094,7 @@
       "tag": "📢 谷歌FCM",
       "outbounds": [
         "direct",
-        "🚀 节点选择",
+        "🚀 模式选择",
         "🇺🇲 美国节点",
         "🇭🇰 香港节点",
         "🇨🇳 台湾节点",
@@ -1056,7 +1109,7 @@
       "tag": "Ⓜ️ 微软Bing",
       "outbounds": [
         "direct",
-        "🚀 节点选择",
+        "🚀 模式选择",
         "🇺🇲 美国节点",
         "🇭🇰 香港节点",
         "🇨🇳 台湾节点",
@@ -1071,7 +1124,7 @@
       "tag": "Ⓜ️ 微软云盘",
       "outbounds": [
         "direct",
-        "🚀 节点选择",
+        "🚀 模式选择",
         "🇺🇲 美国节点",
         "🇭🇰 香港节点",
         "🇨🇳 台湾节点",
@@ -1086,7 +1139,7 @@
       "tag": "Ⓜ️ 微软服务",
       "outbounds": [
         "direct",
-        "🚀 节点选择",
+        "🚀 模式选择",
         "🇺🇲 美国节点",
         "🇭🇰 香港节点",
         "🇨🇳 台湾节点",
@@ -1101,7 +1154,7 @@
       "tag": "🍎 苹果服务",
       "outbounds": [
         "direct",
-        "🚀 节点选择",
+        "🚀 模式选择",
         "🇺🇲 美国节点",
         "🇭🇰 香港节点",
         "🇨🇳 台湾节点",
@@ -1116,7 +1169,7 @@
       "tag": "🎮 游戏平台",
       "outbounds": [
         "direct",
-        "🚀 节点选择",
+        "🚀 模式选择",
         "🇺🇲 美国节点",
         "🇭🇰 香港节点",
         "🇨🇳 台湾节点",
@@ -1131,8 +1184,8 @@
       "tag": "🎶 网易音乐",
       "outbounds": [
         "direct",
-        "🚀 节点选择",
-        "♻️ 自动选择"
+        "🚀 模式选择",
+        "♻️ 延迟优选"
       ]
     },
     {
@@ -1155,8 +1208,8 @@
       "type": "selector",
       "tag": "🐟 漏网之鱼",
       "outbounds": [
-        "🚀 节点选择",
-        "♻️ 自动选择",
+        "🚀 模式选择",
+        "♻️ 延迟优选",
         "direct",
         "🇭🇰 香港节点",
         "🇨🇳 台湾节点",
@@ -1166,59 +1219,6 @@
         "🇰🇷 韩国节点",
         "🚀 手动切换"
       ]
-    },
-    {
-      "type": "urltest",
-      "tag": "🇭🇰 香港节点",
-      "outbounds": [],
-      "url": "http://www.gstatic.com/generate_204",
-      "interval": "300s",
-      "tolerance": 50
-    },
-    {
-      "type": "urltest",
-      "tag": "🇯🇵 日本节点",
-      "outbounds": [],
-      "url": "http://www.gstatic.com/generate_204",
-      "interval": "300s",
-      "tolerance": 50
-    },
-    {
-      "type": "urltest",
-      "tag": "🇺🇲 美国节点",
-      "outbounds": [],
-      "url": "http://www.gstatic.com/generate_204",
-      "interval": "300s",
-      "tolerance": 150
-    },
-    {
-      "type": "urltest",
-      "tag": "🇨🇳 台湾节点",
-      "outbounds": [],
-      "url": "http://www.gstatic.com/generate_204",
-      "interval": "300s",
-      "tolerance": 50
-    },
-    {
-      "type": "urltest",
-      "tag": "🇸🇬 狮城节点",
-      "outbounds": [],
-      "url": "http://www.gstatic.com/generate_204",
-      "interval": "300s",
-      "tolerance": 50
-    },
-    {
-      "type": "urltest",
-      "tag": "🇰🇷 韩国节点",
-      "outbounds": [],
-      "url": "http://www.gstatic.com/generate_204",
-      "interval": "300s",
-      "tolerance": 50
-    },
-    {
-      "type": "selector",
-      "tag": "🎥 奈飞节点",
-      "outbounds": []
     },
     {
       "type": "direct",
@@ -1245,7 +1245,7 @@
       },
       {
         "clash_mode": "global",
-        "outbound": "🚀 节点选择"
+        "outbound": "🚀 模式选择"
       },
       {
         "domain_suffix": [
@@ -4569,7 +4569,7 @@
           "us",
           "ca"
         ],
-        "outbound": "🚀 节点选择"
+        "outbound": "🚀 模式选择"
       },
       {
         "domain_keyword": [
@@ -4594,7 +4594,7 @@
           "whatsapp",
           "youtube"
         ],
-        "outbound": "🚀 节点选择"
+        "outbound": "🚀 模式选择"
       },
       {
         "domain_suffix": [
@@ -11276,7 +11276,7 @@
           "amazon.com",
           "amazonaws.com"
         ],
-        "outbound": "🚀 节点选择"
+        "outbound": "🚀 模式选择"
       },
       {
         "ip_cidr": [
@@ -11296,13 +11296,13 @@
           "54.226.0.0/15",
           "54.230.156.0/22"
         ],
-        "outbound": "🚀 节点选择"
+        "outbound": "🚀 模式选择"
       },
       {
         "domain_keyword": [
           "uk-live"
         ],
-        "outbound": "🚀 节点选择"
+        "outbound": "🚀 模式选择"
       },
       {
         "domain_suffix": [
@@ -11340,7 +11340,7 @@
           "fbcdn.com",
           "fbcdn.net"
         ],
-        "outbound": "🚀 节点选择"
+        "outbound": "🚀 模式选择"
       },
       {
         "ip_cidr": [
@@ -11359,7 +11359,7 @@
           "185.60.216.0/22",
           "204.15.20.0/22"
         ],
-        "outbound": "🚀 节点选择"
+        "outbound": "🚀 模式选择"
       },
       {
         "domain_suffix": [
@@ -11389,7 +11389,7 @@
           "yt.be",
           "ytimg.com"
         ],
-        "outbound": "🚀 节点选择"
+        "outbound": "🚀 模式选择"
       },
       {
         "ip_cidr": [
@@ -11414,7 +11414,7 @@
           "220.181.174.226/32",
           "220.181.174.34/32"
         ],
-        "outbound": "🚀 节点选择"
+        "outbound": "🚀 模式选择"
       },
       {
         "domain_suffix": [
@@ -11426,7 +11426,7 @@
           "kakao.co.kr",
           "kakaocdn.net"
         ],
-        "outbound": "🚀 节点选择"
+        "outbound": "🚀 模式选择"
       },
       {
         "ip_cidr": [
@@ -11437,7 +11437,7 @@
           "110.76.140.0/22",
           "113.61.104.0/22"
         ],
-        "outbound": "🚀 节点选择"
+        "outbound": "🚀 模式选择"
       },
       {
         "domain_suffix": [
@@ -11449,7 +11449,7 @@
           "line.naver.jp",
           "nhncorp.jp"
         ],
-        "outbound": "🚀 节点选择"
+        "outbound": "🚀 模式选择"
       },
       {
         "ip_cidr": [
@@ -11462,19 +11462,19 @@
           "147.92.128.0/17",
           "203.104.128.0/19"
         ],
-        "outbound": "🚀 节点选择"
+        "outbound": "🚀 模式选择"
       },
       {
         "domain": [
           "cloud.oracle.com"
         ],
-        "outbound": "🚀 节点选择"
+        "outbound": "🚀 模式选择"
       },
       {
         "domain_suffix": [
           "oraclecloud.com"
         ],
-        "outbound": "🚀 节点选择"
+        "outbound": "🚀 模式选择"
       },
       {
         "domain_keyword": [
@@ -11482,7 +11482,7 @@
           "onedrive",
           "skydrive"
         ],
-        "outbound": "🚀 节点选择"
+        "outbound": "🚀 模式选择"
       },
       {
         "domain_suffix": [
@@ -11496,13 +11496,13 @@
           "storage.live.com",
           "storage.msn.com"
         ],
-        "outbound": "🚀 节点选择"
+        "outbound": "🚀 模式选择"
       },
       {
         "domain_keyword": [
           "porn"
         ],
-        "outbound": "🚀 节点选择"
+        "outbound": "🚀 模式选择"
       },
       {
         "domain_suffix": [
@@ -11549,7 +11549,7 @@
           "steamstatic.com",
           "steamstat.us"
         ],
-        "outbound": "🚀 节点选择"
+        "outbound": "🚀 模式选择"
       },
       {
         "domain": [
@@ -11560,7 +11560,7 @@
           "steamuserimages-a.akamaihd.net",
           "steampipe.akamaized.net"
         ],
-        "outbound": "🚀 节点选择"
+        "outbound": "🚀 模式选择"
       },
       {
         "domain_suffix": [
@@ -11570,13 +11570,13 @@
           "ttvnw.net",
           "jtvnw.net"
         ],
-        "outbound": "🚀 节点选择"
+        "outbound": "🚀 模式选择"
       },
       {
         "domain_keyword": [
           "ttvnw"
         ],
-        "outbound": "🚀 节点选择"
+        "outbound": "🚀 模式选择"
       },
       {
         "domain_suffix": [
@@ -11591,7 +11591,7 @@
           "telegram.org",
           "telesco.pe"
         ],
-        "outbound": "🚀 节点选择"
+        "outbound": "🚀 模式选择"
       },
       {
         "ip_cidr": [
@@ -11602,14 +11602,14 @@
           "2001:b28:f23d::/48",
           "2001:b28:f23f::/48"
         ],
-        "outbound": "🚀 节点选择"
+        "outbound": "🚀 模式选择"
       },
       {
         "domain_suffix": [
           "terabox.com",
           "teraboxcdn.com"
         ],
-        "outbound": "🚀 节点选择"
+        "outbound": "🚀 模式选择"
       },
       {
         "ip_cidr": [
@@ -11629,7 +11629,7 @@
           "75.126.150.0/16",
           "69.171.235.0/16"
         ],
-        "outbound": "🚀 节点选择"
+        "outbound": "🚀 模式选择"
       },
       {
         "domain_suffix": [
@@ -11652,7 +11652,7 @@
           "vikacg.com",
           "picjs.xyz"
         ],
-        "outbound": "🚀 节点选择"
+        "outbound": "🚀 模式选择"
       },
       {
         "domain_suffix": [
@@ -12605,14 +12605,14 @@
         "type": "remote",
         "format": "binary",
         "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-cn.srs",
-        "download_detour": "🚀 节点选择"
+        "download_detour": "🚀 模式选择"
       },
       {
         "tag": "geoip-cn",
         "type": "remote",
         "format": "binary",
         "url": "https://raw.githubusercontent.com/SagerNet/sing-geoip/rule-set/geoip-cn.srs",
-        "download_detour": "🚀 节点选择"
+        "download_detour": "🚀 模式选择"
       }
     ],
     "final": "🐟 漏网之鱼"

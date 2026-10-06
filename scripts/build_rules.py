@@ -13,7 +13,24 @@ ROOT = Path(__file__).resolve().parents[1]
 ACL_RAW = "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR"
 ACL_API = "https://api.github.com/repos/ACL4SSR/ACL4SSR/commits/master"
 CONFIG = "Clash/config/ACL4SSR_Online_Full.ini"
-PROXY_GROUP = "🚀 节点选择"
+SOURCE_PROXY_GROUP = "🚀 节点选择"
+PROXY_GROUP = "🚀 模式选择"
+SOURCE_AUTO_GROUP = "♻️ 自动选择"
+AUTO_GROUP = "♻️ 延迟优选"
+MANUAL_GROUP = "🚀 手动切换"
+REGION_FLAGS = {
+    "🇭🇰 香港节点": "🇭🇰",
+    "🇯🇵 日本节点": "🇯🇵",
+    "🇺🇲 美国节点": "🇺🇸|🇺🇲",
+    "🇨🇳 台湾节点": "🇹🇼",
+    "🇸🇬 狮城节点": "🇸🇬",
+    "🇰🇷 韩国节点": "🇰🇷",
+}
+DISPLAY_FIRST = (
+    PROXY_GROUP, AUTO_GROUP, MANUAL_GROUP,
+    "🇭🇰 香港节点", "🇨🇳 台湾节点", "🇸🇬 狮城节点",
+    "🇯🇵 日本节点", "🇺🇲 美国节点", "🇰🇷 韩国节点", "🎥 奈飞节点",
+)
 DIRECT_GROUP = "🎯 全球直连"
 REJECT_GROUP = "🛑 全球拦截"
 FINAL_GROUP = "🐟 漏网之鱼"
@@ -92,6 +109,9 @@ def read_proxy_groups(config: str) -> list[dict]:
             continue
         fields = line.removeprefix("custom_proxy_group=").split("`")
         name, kind, *items = fields
+        name = rename_group(name)
+        items = ["[]" + rename_group(item[2:]) if item.startswith("[]") else item
+                 for item in items]
         if not name or name in {group["name"] for group in groups}:
             raise ValueError(f"invalid upstream proxy group: {line}")
         if kind == "select":
@@ -109,7 +129,7 @@ def read_proxy_groups(config: str) -> list[dict]:
         else:
             raise ValueError(f"unsupported upstream proxy group: {line}")
     names = {group["name"] for group in groups}
-    if not {PROXY_GROUP, DIRECT_GROUP, FINAL_GROUP}.issubset(names):
+    if not {PROXY_GROUP, MANUAL_GROUP, DIRECT_GROUP, FINAL_GROUP}.issubset(names):
         raise ValueError("upstream proxy groups are incomplete")
     for group in groups:
         for item in group["items"]:
@@ -118,7 +138,24 @@ def read_proxy_groups(config: str) -> list[dict]:
     return groups
 
 
+def rename_group(name: str) -> str:
+    return {
+        SOURCE_PROXY_GROUP: PROXY_GROUP,
+        SOURCE_AUTO_GROUP: AUTO_GROUP,
+    }.get(name, name)
+
+
+def display_order(groups: list[dict]) -> list[dict]:
+    """Put frequently used groups first without changing their members."""
+    first = {name: index for index, name in enumerate(DISPLAY_FIRST)}
+    return sorted(groups, key=lambda group: (
+        2 if group["name"] == FINAL_GROUP else 0 if group["name"] in first else 1,
+        first.get(group["name"], 0),
+    ))
+
+
 def policy_name(name: str, client: str = "clash") -> str:
+    name = rename_group(name)
     if name in (DIRECT_GROUP, "DIRECT"):
         return "direct" if client == "singbox" else "DIRECT"
     if name in (REJECT_GROUP, "REJECT"):
@@ -145,14 +182,26 @@ def clash_proxy_groups(groups: list[dict]) -> list[dict]:
     for group in groups:
         if group["name"] in HIDDEN_GROUPS:
             continue
-        entry = {"name": group["name"], "type": group["type"],
-                 "proxies": [policy_name(item[2:]) for item in group["items"] if item.startswith("[]")]}
+        members = [policy_name(item[2:]) for item in group["items"] if item.startswith("[]")]
         if group["type"] == "url-test":
             patterns = [group["items"][0]]
         else:
             patterns = [item for item in group["items"] if not item.startswith("[]")]
         if patterns:
-            entry.update({"include-all": True, "filter": "|".join(f"(?:{pattern})" for pattern in patterns)})
+            # XBoard expands regex entries in proxies against the user's nodes.
+            # Its subscription handler does not apply Mihomo's filter field.
+            expression = "|".join(f"(?:{pattern})" for pattern in patterns)
+            if group["name"] in REGION_FLAGS:
+                expression += "|(?:" + REGION_FLAGS[group["name"]] + ")"
+            if "~" in expression:
+                raise ValueError(f"unsupported XBoard regex delimiter in {group['name']}")
+            if not members and expression != "(?:.*)":
+                # Keep referenced filtered groups present when a user has no
+                # matching nodes; the manual group still supplies a proxy.
+                members.append(MANUAL_GROUP)
+            if expression != "(?:.*)":
+                members.append(f"~{expression}~u")
+        entry = {"name": group["name"], "type": group["type"], "proxies": members}
         if group["type"] == "url-test":
             entry.update({"url": group["items"][1], "interval": group["interval"],
                           "tolerance": group["tolerance"]})
@@ -241,7 +290,7 @@ def build() -> dict[Path, str]:
     if len(revision) != 40 or any(c not in "0123456789abcdef" for c in revision):
         raise ValueError("invalid ACL4SSR revision")
     config = fetch(f"{ACL_RAW}/{revision}/{CONFIG}")
-    groups = read_proxy_groups(config)
+    groups = display_order(read_proxy_groups(config))
     group_names = {group["name"] for group in groups}
     group_map = {group["name"]: group for group in groups}
     shadow_policies = {name: shadow_policy(name, group_map) for name in group_names}
@@ -257,6 +306,7 @@ def build() -> dict[Path, str]:
         if not line.startswith("ruleset="):
             continue
         group, source = line[len("ruleset="):].split(",", 1)
+        group = rename_group(group)
         if group not in group_names:
             raise ValueError(f"unexpected upstream group: {group}")
         policy = policy_name(group)

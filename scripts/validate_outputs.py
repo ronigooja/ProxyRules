@@ -2,12 +2,14 @@
 """Check generated client files before publishing any XBoard template."""
 
 import json
+import re
 import sys
 from pathlib import Path
 
 import yaml
 sys.dont_write_bytecode = True
-from build_rules import (DIRECT_GROUP, FINAL_GROUP, PROXY_GROUP,
+from build_rules import (AUTO_GROUP, DIRECT_GROUP, DISPLAY_FIRST, FINAL_GROUP,
+                         PROXY_GROUP, SOURCE_AUTO_GROUP, SOURCE_PROXY_GROUP,
                          read_custom_rules, read_rules, singbox_rule)
 
 
@@ -27,15 +29,26 @@ personal_rules = read_rules(personal_list, "Rules/Personal.list")
 
 assert isinstance(clash.get("proxy-groups"), list)
 group_names = [group["name"] for group in clash["proxy-groups"]]
+assert group_names[:len(DISPLAY_FIRST)] == list(DISPLAY_FIRST)
+assert group_names[-1] == FINAL_GROUP
 assert set(group_names) >= {PROXY_GROUP, FINAL_GROUP}
 assert DIRECT_GROUP not in group_names and "🛑 全球拦截" not in group_names
 groups = {group["name"]: group for group in clash["proxy-groups"]}
 assert "DIRECT" in groups[PROXY_GROUP]["proxies"]
 auto_group = groups[PROXY_GROUP]["proxies"][0]
+assert auto_group == AUTO_GROUP
 assert groups[auto_group]["type"] == "url-test"
-assert groups[auto_group]["filter"] == "(?:.*)"
+assert groups[auto_group]["proxies"] == []
+assert groups["🚀 手动切换"]["proxies"] == []
 assert set(group_names) >= {"💬 Ai平台", "🎥 奈飞视频", "🇭🇰 香港节点"}
-assert "Hong Kong" in groups["🇭🇰 香港节点"]["filter"]
+hong_kong = groups["🇭🇰 香港节点"]["proxies"]
+assert hong_kong[0] == "🚀 手动切换"
+assert len(hong_kong) == 2 and hong_kong[1].startswith("~") and hong_kong[1].endswith("~u")
+assert re.search(hong_kong[1][1:-2], "Hong Kong 01")
+assert re.search(hong_kong[1][1:-2], "🇭🇰 01")
+assert not re.search(hong_kong[1][1:-2], "Japan 01")
+assert groups["🎥 奈飞节点"]["proxies"][0] == "🚀 手动切换"
+assert all("include-all" not in group and "filter" not in group for group in groups.values())
 assert groups[auto_group]["interval"] > 0
 assert groups[auto_group]["tolerance"] >= 0
 assert isinstance(clash.get("rules"), list) and len(clash["rules"]) > 1000
@@ -74,6 +87,7 @@ for rule in route["rules"]:
 assert len(flat_rules) > 1000
 assert len(route["rules"]) < len(flat_rules) / 2
 assert {outbound["tag"] for outbound in singbox["outbounds"]} == set(group_names) | {"direct", "block"}
+assert [outbound["tag"] for outbound in singbox["outbounds"][:len(DISPLAY_FIRST)]] == list(DISPLAY_FIRST)
 singbox_outbounds = {outbound["tag"]: outbound for outbound in singbox["outbounds"]}
 assert "direct" in singbox_outbounds[PROXY_GROUP]["outbounds"]
 assert singbox_outbounds[auto_group]["type"] == "urltest"
@@ -86,6 +100,10 @@ assert surge.rstrip().endswith(f"FINAL,{FINAL_GROUP}")
 assert "[Proxy]" in surfboard and "[Rule]" in surfboard
 assert surfboard.rstrip().endswith(f"FINAL,{FINAL_GROUP}")
 for content in (surge, surfboard):
+    displayed = [line.split(" = ", 1)[0] for line in content.split("[Proxy Group]\n", 1)[1]
+                 .split("\n[Rule]", 1)[0].splitlines() if " = " in line]
+    assert displayed[:len(DISPLAY_FIRST)] == list(DISPLAY_FIRST)
+    assert displayed[-1] == FINAL_GROUP
     assert f"{PROXY_GROUP} = select, {auto_group}," in content
     assert f"{FINAL_GROUP} = select, {PROXY_GROUP}," in content
     assert f"{DIRECT_GROUP} =" not in content
@@ -97,6 +115,9 @@ for content in (surge, surfboard, shadow):
         reject = "REJECT" if content is shadow else app_policy
         assert content.index(f"DOMAIN-SUFFIX,a.youdao.com,{reject}") < content.index(rendered) < content.index("DOMAIN-SUFFIX,cn,DIRECT")
 assert "[Rule]" in shadow and "[Host]" in shadow
+for content in (clash, clashmeta, stash, singbox, surge, surfboard):
+    rendered = content if isinstance(content, str) else json.dumps(content, ensure_ascii=False)
+    assert SOURCE_PROXY_GROUP not in rendered and SOURCE_AUTO_GROUP not in rendered
 assert "RULE-SET,https://raw.githubusercontent.com/ronigooja/ProxyRules/main/Rules/Personal.list,DIRECT" in shadow
 assert shadow.index("FINAL,PROXY") < shadow.index("[Host]")
 

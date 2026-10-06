@@ -1,6 +1,8 @@
 # ProxyRules
 
-ACL4SSR 的 `Online Full` 是规则和代理组的上游。[Rules/Custom.list](Rules/Custom.list) 收录原 `ChinaAI.list` 的国内 AI 直连规则，并入上游；支持 `DIRECT`、`REJECT`、`Proxy` 策略，插入位置在应用广告拦截规则之后、一般国内直连规则之前。生成脚本使用同一上游版本生成 XBoard 的 Sing-box、Clash、Clash Meta、Stash、Surge、Surfboard 模板和独立的 Shadowrocket 配置。XBoard 模板保留上游服务和地区组，将 `🎯 全球直连`、`🛑 全球拦截` 映射为客户端内置的直连、拒绝出口，不生成这两个可见组。XBoard 在响应用户订阅时自行填入该用户的节点。独立的 Shadowrocket 配置不含节点，规则仍使用其内置的 `DIRECT`、`REJECT`、`PROXY` 出口。
+ACL4SSR 的 `Online Full` 是规则和代理组的上游。[Rules/Custom.list](Rules/Custom.list) 收录原 `ChinaAI.list` 的国内 AI 直连规则，并入上游；支持 `DIRECT`、`REJECT`、`Proxy` 策略，插入位置在应用广告拦截规则之后、一般国内直连规则之前。生成脚本使用同一上游版本生成 XBoard 的 Sing-box、Clash、Clash Meta、Stash、Surge、Surfboard 模板和独立的 Shadowrocket 配置。XBoard 模板保留上游服务和地区组，将 `🎯 全球直连`、`🛑 全球拦截` 映射为客户端内置的直连、拒绝出口，不生成这两个可见组。Clash、Clash Meta、Stash 模板在 `proxies` 中使用 XBoard 可识别的正则表达式，让 XBoard 按节点名填充地区组；没有匹配节点时，地区组保留手动切换组作为后备。请通过 XBoard 用户订阅导入，仓库中的模板文件本身不含节点。独立的 Shadowrocket 配置不含节点，规则仍使用其内置的 `DIRECT`、`REJECT`、`PROXY` 出口。
+
+代理组显示顺序为模式选择、延迟优选、手动切换、地区组、应用分流组，漏网之鱼置于末尾。模式选择用于切换自动、地区、手动及直连方式；延迟优选按测速结果选用节点。
 
 ## 独立规则链接
 

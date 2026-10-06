@@ -2,8 +2,8 @@
   "dns": {
     "servers": [
       {"tag": "local", "type": "https", "server": "dns.alidns.com", "detour": "direct"},
-      {"tag": "remote", "type": "https", "server": "dns.cloudflare.com", "detour": "🚀 节点选择"},
-      {"tag": "remote-google", "type": "https", "server": "dns.google", "detour": "🚀 节点选择"}
+      {"tag": "remote", "type": "https", "server": "dns.cloudflare.com", "detour": "🚀 模式选择"},
+      {"tag": "remote-google", "type": "https", "server": "dns.google", "detour": "🚀 模式选择"}
     ],
     "rules": [
       {"clash_mode": "direct", "server": "local"},
@@ -25,11 +25,11 @@
     "rules": [
       {"protocol": "dns", "action": "hijack-dns"},
       {"clash_mode": "direct", "outbound": "direct"},
-      {"clash_mode": "global", "outbound": "🚀 节点选择"}
+      {"clash_mode": "global", "outbound": "🚀 模式选择"}
     ],
     "rule_set": [
-      {"tag": "geosite-cn", "type": "remote", "format": "binary", "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-cn.srs", "download_detour": "🚀 节点选择"},
-      {"tag": "geoip-cn", "type": "remote", "format": "binary", "url": "https://raw.githubusercontent.com/SagerNet/sing-geoip/rule-set/geoip-cn.srs", "download_detour": "🚀 节点选择"}
+      {"tag": "geosite-cn", "type": "remote", "format": "binary", "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-cn.srs", "download_detour": "🚀 模式选择"},
+      {"tag": "geoip-cn", "type": "remote", "format": "binary", "url": "https://raw.githubusercontent.com/SagerNet/sing-geoip/rule-set/geoip-cn.srs", "download_detour": "🚀 模式选择"}
     ]
   }
 }
