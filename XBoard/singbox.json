@@ -11,13 +11,13 @@
         "tag": "remote",
         "type": "https",
         "server": "dns.cloudflare.com",
-        "detour": "节点选择"
+        "detour": "🚀 节点选择"
       },
       {
         "tag": "remote-google",
         "type": "https",
         "server": "dns.google",
-        "detour": "节点选择"
+        "detour": "🚀 节点选择"
       }
     ],
     "rules": [
@@ -3668,17 +3668,45 @@
   "outbounds": [
     {
       "type": "selector",
-      "tag": "节点选择",
+      "tag": "🚀 节点选择",
       "outbounds": [
-        "自动选择",
+        "♻️ 自动选择",
         "direct"
-      ],
-      "default": "自动选择"
+      ]
     },
     {
       "type": "urltest",
-      "tag": "自动选择",
-      "outbounds": []
+      "tag": "♻️ 自动选择",
+      "outbounds": [],
+      "url": "http://www.gstatic.com/generate_204",
+      "interval": "300s",
+      "tolerance": 50
+    },
+    {
+      "type": "selector",
+      "tag": "🎯 全球直连",
+      "outbounds": [
+        "direct",
+        "🚀 节点选择",
+        "♻️ 自动选择"
+      ]
+    },
+    {
+      "type": "selector",
+      "tag": "🛑 全球拦截",
+      "outbounds": [
+        "block",
+        "direct"
+      ]
+    },
+    {
+      "type": "selector",
+      "tag": "🐟 漏网之鱼",
+      "outbounds": [
+        "🚀 节点选择",
+        "🎯 全球直连",
+        "♻️ 自动选择"
+      ]
     },
     {
       "type": "direct",
@@ -3705,7 +3733,7 @@
       },
       {
         "clash_mode": "global",
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_suffix": [
@@ -3717,7 +3745,7 @@
           "local",
           "localhost"
         ],
-        "outbound": "direct"
+        "outbound": "🎯 全球直连"
       },
       {
         "ip_cidr": [
@@ -3735,7 +3763,7 @@
           "fe80::/10",
           "fd00::/8"
         ],
-        "outbound": "direct"
+        "outbound": "🎯 全球直连"
       },
       {
         "domain": [
@@ -3744,7 +3772,7 @@
           "router.asus.com",
           "www.asusrouter.com"
         ],
-        "outbound": "direct"
+        "outbound": "🎯 全球直连"
       },
       {
         "domain_suffix": [
@@ -3764,20 +3792,20 @@
           "ol.epicgames.com",
           "dizhensubao.getui.com"
         ],
-        "outbound": "direct"
+        "outbound": "🎯 全球直连"
       },
       {
         "domain": [
           "dl.google.com"
         ],
-        "outbound": "direct"
+        "outbound": "🎯 全球直连"
       },
       {
         "domain_suffix": [
           "googletraveladservices.com",
           "tracking-protection.cdn.mozilla.net"
         ],
-        "outbound": "direct"
+        "outbound": "🎯 全球直连"
       },
       {
         "domain": [
@@ -3793,7 +3821,7 @@
           "bdtj.tagtic.cn",
           "rewards.hypixel.net"
         ],
-        "outbound": "direct"
+        "outbound": "🎯 全球直连"
       },
       {
         "domain_suffix": [
@@ -3813,7 +3841,7 @@
           "FamilyDS.net",
           "FamilyDS.org"
         ],
-        "outbound": "direct"
+        "outbound": "🎯 全球直连"
       },
       {
         "domain_keyword": [
@@ -3842,7 +3870,7 @@
           "wlmonitor",
           "zjtoolbar"
         ],
-        "outbound": "block"
+        "outbound": "🛑 全球拦截"
       },
       {
         "domain_suffix": [
@@ -4945,13 +4973,13 @@
           "s.qd.qingting.fm",
           "s.qd.qingtingfm.com"
         ],
-        "outbound": "block"
+        "outbound": "🛑 全球拦截"
       },
       {
         "domain_keyword": [
           "omgmtaw"
         ],
-        "outbound": "block"
+        "outbound": "🛑 全球拦截"
       },
       {
         "domain": [
@@ -4966,7 +4994,7 @@
           "wxsnsdy.wxs.qq.com",
           "wxsnsdythumb.wxs.qq.com"
         ],
-        "outbound": "block"
+        "outbound": "🛑 全球拦截"
       },
       {
         "domain_suffix": [
@@ -5174,7 +5202,7 @@
           "policy.video.iqiyi.com",
           "yuedu.iqiyi.com"
         ],
-        "outbound": "block"
+        "outbound": "🛑 全球拦截"
       },
       {
         "ip_cidr": [
@@ -5184,7 +5212,7 @@
           "101.227.97.240/32",
           "124.192.153.42/32"
         ],
-        "outbound": "block"
+        "outbound": "🛑 全球拦截"
       },
       {
         "domain_suffix": [
@@ -5317,7 +5345,7 @@
           "ykrec.youku.com",
           "ykrectab.youku.com"
         ],
-        "outbound": "block"
+        "outbound": "🛑 全球拦截"
       },
       {
         "ip_cidr": [
@@ -5336,7 +5364,7 @@
           "223.87.182.11/32",
           "223.87.182.52/32"
         ],
-        "outbound": "block"
+        "outbound": "🛑 全球拦截"
       },
       {
         "domain_suffix": [
@@ -5462,7 +5490,7 @@
           "tralog.ganji.com",
           "up.qingdaonews.com"
         ],
-        "outbound": "block"
+        "outbound": "🛑 全球拦截"
       },
       {
         "domain_suffix": [
@@ -5502,7 +5530,12 @@
           "jd.com",
           "youdao.com",
           "volcengineapi.com",
-          "tencentcloud.com",
+          "tencentcloud.com"
+        ],
+        "outbound": "direct"
+      },
+      {
+        "domain_suffix": [
           "265.com",
           "2mdn.net",
           "alt1-mtalk.google.com",
@@ -5533,7 +5566,7 @@
           "tools.l.google.com",
           "www-googletagmanager.l.google.com"
         ],
-        "outbound": "direct"
+        "outbound": "🎯 全球直连"
       },
       {
         "domain": [
@@ -5550,7 +5583,7 @@
           "wmsjsteam.com",
           "xz.pphimalayanrt.com"
         ],
-        "outbound": "direct"
+        "outbound": "🎯 全球直连"
       },
       {
         "domain_suffix": [
@@ -5559,7 +5592,7 @@
           "steamcontent.com",
           "steamusercontent.com"
         ],
-        "outbound": "direct"
+        "outbound": "🎯 全球直连"
       },
       {
         "domain_suffix": [
@@ -5570,7 +5603,7 @@
           "telegram.org",
           "telesco.pe"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "ip_cidr": [
@@ -5582,14 +5615,14 @@
           "2001:b28:f23d::/48",
           "2001:b28:f23f::/48"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_suffix": [
           "edgedatg.com",
           "go.com"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_keyword": [
@@ -5597,7 +5630,7 @@
           "claude",
           "openai"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain": [
@@ -5614,7 +5647,7 @@
           "notebooklm.google.com",
           "sydney.bing.com"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_suffix": [
@@ -5651,13 +5684,13 @@
           "sora.com",
           "x.ai"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_keyword": [
           "abematv.akamaized.net"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_suffix": [
@@ -5668,13 +5701,13 @@
           "c4assets.com",
           "channel4.com"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_keyword": [
           "avoddashs"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain": [
@@ -5689,7 +5722,7 @@
           "dmqdd6hw24ucf.cloudfront.net",
           "ktpx.amazon.com"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_suffix": [
@@ -5705,7 +5738,7 @@
           "pv-cdn.net",
           "seattlespheres.com"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain": [
@@ -5713,20 +5746,20 @@
           "np-edge.itunes.apple.com",
           "play-edge.itunes.apple.com"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_suffix": [
           "tv.apple.com"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_keyword": [
           "bbcfmt",
           "uk-live"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain": [
@@ -5735,7 +5768,7 @@
           "vod-dash-uk-live.akamaized.net",
           "vod-thumb-uk-live.akamaized.net"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_suffix": [
@@ -5748,7 +5781,7 @@
           "bbci.co.uk",
           "bidi.net.uk"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain": [
@@ -5756,26 +5789,26 @@
           "gamer-cds.cdn.hinet.net",
           "gamer2-cds.cdn.hinet.net"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_suffix": [
           "bahamut.com.tw",
           "gamer.com.tw"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_keyword": [
           "voddazn"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain": [
           "d151l6v8er5bdm.cloudfront.net"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_suffix": [
@@ -5794,13 +5827,13 @@
           "discovery.com",
           "uplynk.com"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain": [
           "cdn.registerdisney.go.com"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_suffix": [
@@ -5824,7 +5857,7 @@
           "execute-api.us-east-1.amazonaws.com",
           "js-agent.newrelic.com"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain": [
@@ -5833,7 +5866,7 @@
           "edge.api.brightcove.com",
           "videos-f.jwpsrv.com"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_suffix": [
@@ -5847,13 +5880,13 @@
           "hbomaxcdn.com",
           "hbonow.com"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_keyword": [
           "hbogoasia"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain": [
@@ -5873,7 +5906,7 @@
           "players.brightcove.net",
           "s3-ap-southeast-1.amazonaws.com"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_suffix": [
@@ -5896,13 +5929,13 @@
           "streaks.jp",
           "yb.uncn.jp"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain": [
           "itvpnpmobile-a.akamaihd.net"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_suffix": [
@@ -5910,26 +5943,26 @@
           "itvstatic.com",
           "iwara.tv"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_keyword": [
           "jooxweb-api"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_suffix": [
           "joox.com"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_keyword": [
           "japonx",
           "japronx"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_suffix": [
@@ -5945,39 +5978,39 @@
           "kkbox.com",
           "kkbox.com.tw"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain": [
           "kktv-theater.kk.stream",
           "theater-kktv.cdn.hinet.net"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_suffix": [
           "kktv.com.tw",
           "kktv.me"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain": [
           "litvfreemobile-hichannel.cdn.hinet.net"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_suffix": [
           "litv.tv"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain": [
           "d3c7rimkq79yfu.cloudfront.net"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_suffix": [
@@ -5985,41 +6018,41 @@
           "linetv.tw",
           "profile.line-scdn.net"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain": [
           "d349g9zuie06uo.cloudfront.net"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_suffix": [
           "channel5.com",
           "my5.tv"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_keyword": [
           "nowtv100",
           "rthklive"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain": [
           "mytvsuperlimited.hb.omtrdc.net",
           "mytvsuperlimited.sc.omtrdc.net"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_suffix": [
           "mytvsuper.com",
           "tvb.com"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_keyword": [
@@ -6027,13 +6060,13 @@
           "dualstack.apiproxy-",
           "netflixdnstest"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain": [
           "netflix.com.edgesuite.net"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_suffix": [
@@ -6056,7 +6089,7 @@
           "nflxso.net",
           "nflxvideo.net"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "ip_cidr": [
@@ -6079,7 +6112,7 @@
           "207.45.72.0/22",
           "208.75.76.0/22"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_suffix": [
@@ -6087,13 +6120,13 @@
           "nicovideo.jp",
           "nimg.jp"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_keyword": [
           "nivod"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_suffix": [
@@ -6108,13 +6141,13 @@
           "nivodz.com",
           "vod360.net"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_keyword": [
           "olevod"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_suffix": [
@@ -6127,13 +6160,13 @@
           "olevod.tv",
           "olevodtv.com"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_keyword": [
           "openai"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_suffix": [
@@ -6163,14 +6196,14 @@
           "sndcdn.com",
           "soundcloud.com"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_keyword": [
           "-spotify-",
           "spotify.com"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_suffix": [
@@ -6184,25 +6217,25 @@
           "tidal.com",
           "tidalhifi.com"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain": [
           "hamifans.emome.net"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_suffix": [
           "skyking.com.tw"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_keyword": [
           "tiktokcdn"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_suffix": [
@@ -6216,13 +6249,13 @@
           "tiktokcdn.com",
           "tiktokv.com"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_keyword": [
           "ttvnw"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_suffix": [
@@ -6233,7 +6266,7 @@
           "twitch.tv",
           "twitchcdn.net"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "process_name": [
@@ -6241,7 +6274,7 @@
           "com.viu.phone",
           "com.vuclip.viu"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain": [
@@ -6250,7 +6283,7 @@
           "d2anahhhmp1ffz.cloudfront.net",
           "dfp6rglgjqszk.cloudfront.net"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_suffix": [
@@ -6263,20 +6296,20 @@
           "viu.now.com",
           "viu.tv"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_keyword": [
           "youtube"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain": [
           "youtubei.googleapis.com",
           "yt3.ggpht.com"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_suffix": [
@@ -6292,13 +6325,13 @@
           "yt.be",
           "ytimg.com"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain": [
           "music.youtube.com"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_suffix": [
@@ -6331,7 +6364,7 @@
           "tw",
           "uk"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_keyword": [
@@ -6356,7 +6389,7 @@
           "whatsapp",
           "youtube"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_suffix": [
@@ -6473,7 +6506,7 @@
           "amazon.com",
           "amazonaws.com"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "ip_cidr": [
@@ -6493,13 +6526,13 @@
           "54.226.0.0/15",
           "54.230.156.0/22"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_keyword": [
           "uk-live"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_suffix": [
@@ -6528,7 +6561,7 @@
           "spring.net",
           "stackoverflow.com"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain": [
@@ -6536,7 +6569,7 @@
           "d2wy8f7a9ursnm.cloudfront.net",
           "d36jcksde1wxzq.cloudfront.net"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_suffix": [
@@ -6556,7 +6589,7 @@
           "fbcdn.com",
           "fbcdn.net"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "ip_cidr": [
@@ -6575,7 +6608,7 @@
           "185.60.216.0/22",
           "204.15.20.0/22"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_suffix": [
@@ -6606,7 +6639,7 @@
           "yt.be",
           "ytimg.com"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "ip_cidr": [
@@ -6631,7 +6664,7 @@
           "220.181.174.226/32",
           "220.181.174.34/32"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_suffix": [
@@ -6643,7 +6676,7 @@
           "kakao.co.kr",
           "kakaocdn.net"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "ip_cidr": [
@@ -6654,7 +6687,7 @@
           "110.76.140.0/22",
           "113.61.104.0/22"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_suffix": [
@@ -6666,7 +6699,7 @@
           "line.naver.jp",
           "nhncorp.jp"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "ip_cidr": [
@@ -6679,14 +6712,14 @@
           "147.92.128.0/17",
           "203.104.128.0/19"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_suffix": [
           "openai.com",
           "challenges.cloudflare.com"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_keyword": [
@@ -6694,7 +6727,7 @@
           "onedrive",
           "skydrive"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_suffix": [
@@ -6709,13 +6742,13 @@
           "storage.msn.com",
           "microsoftpersonalcontent.com"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_keyword": [
           "porn"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_suffix": [
@@ -6762,7 +6795,7 @@
           "steamstatic.com",
           "steamstat.us"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain": [
@@ -6773,7 +6806,7 @@
           "steamuserimages-a.akamaihd.net",
           "steampipe.akamaized.net"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_suffix": [
@@ -6783,13 +6816,13 @@
           "ttvnw.net",
           "jtvnw.net"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_keyword": [
           "ttvnw"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_suffix": [
@@ -6805,7 +6838,7 @@
           "telegram.org",
           "telesco.pe"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "ip_cidr": [
@@ -6816,14 +6849,14 @@
           "2001:b28:f23d::/48",
           "2001:b28:f23f::/48"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_suffix": [
           "terabox.com",
           "teraboxcdn.com"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "ip_cidr": [
@@ -6843,7 +6876,7 @@
           "75.126.150.0/16",
           "69.171.235.0/16"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_suffix": [
@@ -6868,7 +6901,7 @@
           "vikacg.com",
           "picjs.xyz"
         ],
-        "outbound": "节点选择"
+        "outbound": "🚀 节点选择"
       },
       {
         "domain_suffix": [
@@ -6894,7 +6927,7 @@
           "xn--55qx5d",
           "xn--io0a7i"
         ],
-        "outbound": "direct"
+        "outbound": "🎯 全球直连"
       },
       {
         "domain_keyword": [
@@ -6915,7 +6948,7 @@
           "xiami",
           "xiaomi"
         ],
-        "outbound": "direct"
+        "outbound": "🎯 全球直连"
       },
       {
         "domain_suffix": [
@@ -7050,7 +7083,7 @@
           "cctvpic.com",
           "livechina.com"
         ],
-        "outbound": "direct"
+        "outbound": "🎯 全球直连"
       },
       {
         "domain": [
@@ -7066,7 +7099,7 @@
           "opencloud.wostore.cn",
           "ye.dun.163yun.com"
         ],
-        "outbound": "direct"
+        "outbound": "🎯 全球直连"
       },
       {
         "domain_suffix": [
@@ -7205,7 +7238,7 @@
           "steamusercontent.com",
           "steamchina.com"
         ],
-        "outbound": "direct"
+        "outbound": "🎯 全球直连"
       },
       {
         "domain": [
@@ -7222,7 +7255,7 @@
           "steampowered.com.8686c.com",
           "steamstatic.com.8686c.com"
         ],
-        "outbound": "direct"
+        "outbound": "🎯 全球直连"
       },
       {
         "domain_suffix": [
@@ -7276,7 +7309,7 @@
           "zmzfile.com",
           "teamviewer.com"
         ],
-        "outbound": "direct"
+        "outbound": "🎯 全球直连"
       },
       {
         "ip_cidr": [
@@ -7289,7 +7322,7 @@
           "2a0b:b582::/48",
           "2a0b:b583::/48"
         ],
-        "outbound": "direct"
+        "outbound": "🎯 全球直连"
       },
       {
         "domain_suffix": [
@@ -7302,13 +7335,13 @@
           "dns.alidns.com",
           "doh.360.cn"
         ],
-        "outbound": "direct"
+        "outbound": "🎯 全球直连"
       },
       {
         "ip_cidr": [
           "1.12.12.12/32"
         ],
-        "outbound": "direct"
+        "outbound": "🎯 全球直连"
       },
       {
         "domain_suffix": [
@@ -7558,7 +7591,7 @@
           "cmbchina.com",
           "95516.com"
         ],
-        "outbound": "direct"
+        "outbound": "🎯 全球直连"
       },
       {
         "ip_cidr": [
@@ -7771,13 +7804,13 @@
           "101.198.208.0/20",
           "101.199.196.0/22"
         ],
-        "outbound": "direct"
+        "outbound": "🎯 全球直连"
       },
       {
         "rule_set": [
           "geoip-cn"
         ],
-        "outbound": "direct"
+        "outbound": "🎯 全球直连"
       }
     ],
     "rule_set": [
@@ -7786,16 +7819,16 @@
         "type": "remote",
         "format": "binary",
         "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-cn.srs",
-        "download_detour": "节点选择"
+        "download_detour": "🚀 节点选择"
       },
       {
         "tag": "geoip-cn",
         "type": "remote",
         "format": "binary",
         "url": "https://raw.githubusercontent.com/SagerNet/sing-geoip/rule-set/geoip-cn.srs",
-        "download_detour": "节点选择"
+        "download_detour": "🚀 节点选择"
       }
     ],
-    "final": "节点选择"
+    "final": "🐟 漏网之鱼"
   }
 }

@@ -1,6 +1,6 @@
 # ProxyRules
 
-ACL4SSR 的 `Online Mini` 是基础规则上游。[Rules/Custom.list](Rules/Custom.list) 收录原 `ChinaAI.list` 的国内 AI 直连规则，并入上游；支持 `DIRECT`、`REJECT`、`Proxy` 策略，插入位置在广告拦截规则之后、一般国内直连规则之前。生成脚本使用同一上游版本生成 XBoard 的 Sing-box、Clash、Clash Meta、Stash、Surge、Surfboard 模板和独立的 Shadowrocket 配置。XBoard 在响应用户订阅时自行填入该用户的节点。
+ACL4SSR 的 `Online Mini` 是规则和代理组的上游。[Rules/Custom.list](Rules/Custom.list) 收录原 `ChinaAI.list` 的国内 AI 直连规则，并入上游；支持 `DIRECT`、`REJECT`、`Proxy` 策略，插入位置在广告拦截规则之后、一般国内直连规则之前。生成脚本使用同一上游版本生成 XBoard 的 Sing-box、Clash、Clash Meta、Stash、Surge、Surfboard 模板和独立的 Shadowrocket 配置。六种 XBoard 模板采用上游 `custom_proxy_group` 定义的组名、类型、成员和测速参数，`.*` 节点匹配由各客户端格式适配。XBoard 在响应用户订阅时自行填入该用户的节点。独立的 Shadowrocket 配置不含节点，规则仍使用其内置的 `DIRECT`、`REJECT`、`PROXY` 出口。
 
 ## 独立规则链接
 
