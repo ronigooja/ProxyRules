@@ -21,28 +21,12 @@ dns:
   enhanced-mode: fake-ip
   fake-ip-range: 198.18.0.1/16
   use-hosts: true
-  nameserver-policy:
-    "+.google.com": ["https://dns.cloudflare.com/dns-query", "https://dns.google/dns-query"]
-    "+.googleapis.com": ["https://dns.cloudflare.com/dns-query", "https://dns.google/dns-query"]
-    "+.googleapis.cn": ["https://dns.cloudflare.com/dns-query", "https://dns.google/dns-query"]
-    "+.googlevideo.com": ["https://dns.cloudflare.com/dns-query", "https://dns.google/dns-query"]
-    "+.gstatic.com": ["https://dns.cloudflare.com/dns-query", "https://dns.google/dns-query"]
-    "+.youtube.com": ["https://dns.cloudflare.com/dns-query", "https://dns.google/dns-query"]
-    "+.youtu.be": ["https://dns.cloudflare.com/dns-query", "https://dns.google/dns-query"]
-    "+.facebook.com": ["https://dns.cloudflare.com/dns-query", "https://dns.google/dns-query"]
-    "+.twitter.com": ["https://dns.cloudflare.com/dns-query", "https://dns.google/dns-query"]
-    "+.x.com": ["https://dns.cloudflare.com/dns-query", "https://dns.google/dns-query"]
-    "+.github.com": ["https://dns.cloudflare.com/dns-query", "https://dns.google/dns-query"]
-    "+.githubusercontent.com": ["https://dns.cloudflare.com/dns-query", "https://dns.google/dns-query"]
-    "+.openai.com": ["https://dns.cloudflare.com/dns-query", "https://dns.google/dns-query"]
-    "+.chatgpt.com": ["https://dns.cloudflare.com/dns-query", "https://dns.google/dns-query"]
-    "+.anthropic.com": ["https://dns.cloudflare.com/dns-query", "https://dns.google/dns-query"]
   nameserver:
-    - https://dns.alidns.com/dns-query
-    - tls://dns.alidns.com:853
+    - https://dns.cloudflare.com/dns-query
+    - https://dns.google/dns-query
   fallback:
-    - https://dns.alidns.com/dns-query
-    - tls://dns.alidns.com:853
+    - https://dns.cloudflare.com/dns-query
+    - https://dns.google/dns-query
   fallback-filter:
     geoip: true
     geoip-code: CN
