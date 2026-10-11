@@ -25,12 +25,14 @@ REGION_FLAGS = {
     "🇭🇰 香港地区": "🇭🇰",
     "🇯🇵 日本地区": "🇯🇵",
     "🇺🇸 美国地区": "🇺🇸|🇺🇲",
-    "🇹🇼 台湾地区": "🇹🇼",
+    # The display marker is kept separate from node matching. Do not include
+    # the unsupported Taiwan flag emoji in generated match expressions.
+    "🇨🇳 台湾地区": "",
     "🇸🇬 新加坡地区": "🇸🇬",
     "🇰🇷 韩国地区": "🇰🇷",
 }
 REGION_GROUPS = (
-    "🇭🇰 香港地区", "🇹🇼 台湾地区", "🇸🇬 新加坡地区",
+    "🇭🇰 香港地区", "🇨🇳 台湾地区", "🇸🇬 新加坡地区",
     "🇯🇵 日本地区", "🇺🇸 美国地区", "🇰🇷 韩国地区",
 )
 DISPLAY_FIRST = (PROXY_GROUP, AUTO_GROUP, MANUAL_GROUP, *REGION_GROUPS)
@@ -42,7 +44,7 @@ APP_DEFAULTS = {
     "💬 Ai平台": "🇸🇬 新加坡地区",
     "📹 油管视频": "🇺🇸 美国地区",
     "🎥 奈飞视频": "🇺🇸 美国地区",
-    "📺 巴哈姆特": "🇹🇼 台湾地区",
+    "📺 巴哈姆特": "🇨🇳 台湾地区",
     "📺 哔哩哔哩": "DIRECT",
     "🌍 国外媒体": PROXY_GROUP,
     "📢 谷歌FCM": "DIRECT",
@@ -201,7 +203,7 @@ def rename_group(name: str) -> str:
         "🚀 默认出口": PROXY_GROUP,
         "🇸🇬 狮城节点": "🇸🇬 新加坡地区",
         '🇭🇰 香港节点': '🇭🇰 香港地区',
-        '🇨🇳 台湾节点': '🇹🇼 台湾地区',
+        '🇨🇳 台湾节点': '🇨🇳 台湾地区',
         '🇸🇬 新加坡节点': '🇸🇬 新加坡地区',
         '🇯🇵 日本节点': '🇯🇵 日本地区',
         '🇺🇲 美国节点': '🇺🇸 美国地区',
@@ -259,7 +261,7 @@ def node_expression(group: dict) -> str | None:
     if not patterns:
         return None
     expression = "|".join(f"(?:{pattern})" for pattern in patterns)
-    if group["name"] in REGION_FLAGS:
+    if group["name"] in REGION_FLAGS and REGION_FLAGS[group["name"]]:
         expression += "|(?:" + REGION_FLAGS[group["name"]] + ")"
     if "~" in expression:
         raise ValueError(f"unsupported XBoard regex delimiter in {group['name']}")
