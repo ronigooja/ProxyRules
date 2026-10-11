@@ -44,8 +44,8 @@ assert auto_group == AUTO_GROUP
 assert groups[auto_group]["type"] == "url-test"
 assert groups[auto_group]["proxies"] == []
 assert groups[MANUAL_GROUP]["proxies"] == []
-assert set(group_names) >= {"💬 Ai平台", "🎥 奈飞视频", "🇭🇰 香港节点"}
-hong_kong = groups["🇭🇰 香港节点"]["proxies"]
+assert set(group_names) >= {"💬 Ai平台", "🎥 奈飞视频", "🇭🇰 香港地区"}
+hong_kong = groups["🇭🇰 香港地区"]["proxies"]
 assert hong_kong[0] == "REJECT"
 assert len(hong_kong) == 2 and hong_kong[1].startswith("~") and hong_kong[1].endswith("~u")
 assert re.search(hong_kong[1][1:-2], "Hong Kong 01")
@@ -78,8 +78,8 @@ for name in (PROXY_GROUP, *BLOCK_GROUPS, FINAL_GROUP):
 for name, default in APP_DEFAULTS.items():
     assert expanded[name][0] == default
     assert set(sample_nodes) <= set(expanded[name])
-assert set(expanded["🇭🇰 香港节点"]) == {"REJECT", "Hong Kong 01", "🇭🇰 02"}
-assert MANUAL_GROUP not in expanded["🇭🇰 香港节点"]
+assert set(expanded["🇭🇰 香港地区"]) == {"REJECT", "Hong Kong 01", "🇭🇰 02"}
+assert MANUAL_GROUP not in expanded["🇭🇰 香港地区"]
 assert all("include-all" not in group and "filter" not in group for group in groups.values())
 assert groups[auto_group]["interval"] > 0
 assert groups[auto_group]["tolerance"] >= 0

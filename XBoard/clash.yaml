@@ -59,28 +59,28 @@ dns:
 proxies:
 
 proxy-groups:
-  - {"name": "🚀 默认代理", "type": "select", "proxies": ["♻️ 自动优选", "🇭🇰 香港节点", "🇨🇳 台湾节点", "🇸🇬 新加坡节点", "🇯🇵 日本节点", "🇺🇲 美国节点", "🇰🇷 韩国节点", "🚀 手动选择", "DIRECT", "~(?!)~u"]}
-  - {"name": "♻️ 自动优选", "type": "url-test", "proxies": [], "url": "http://www.gstatic.com/generate_204", "interval": 300, "tolerance": 50}
+  - {"name": "🚀 默认代理", "type": "select", "proxies": ["♻️ 自动优选", "🚀 手动选择", "🇭🇰 香港地区", "🇹🇼 台湾地区", "🇸🇬 新加坡地区", "🇯🇵 日本地区", "🇺🇸 美国地区", "🇰🇷 韩国地区", "DIRECT", "~(?!)~u"]}
+  - {"name": "♻️ 自动优选", "type": "url-test", "proxies": [], "url": "http://www.gstatic.com/generate_204", "interval": 1800, "tolerance": 50}
   - {"name": "🚀 手动选择", "type": "select", "proxies": []}
-  - {"name": "🇭🇰 香港节点", "type": "url-test", "proxies": ["REJECT", "~(?:(港|HK|hk|Hong Kong|HongKong|hongkong))|(?:🇭🇰)~u"], "url": "http://www.gstatic.com/generate_204", "interval": 300, "tolerance": 50}
-  - {"name": "🇨🇳 台湾节点", "type": "url-test", "proxies": ["REJECT", "~(?:(台|新北|彰化|TW|Taiwan))|(?:🇹🇼)~u"], "url": "http://www.gstatic.com/generate_204", "interval": 300, "tolerance": 50}
-  - {"name": "🇸🇬 新加坡节点", "type": "url-test", "proxies": ["REJECT", "~(?:(新加坡|坡|狮城|SG|Singapore))|(?:🇸🇬)~u"], "url": "http://www.gstatic.com/generate_204", "interval": 300, "tolerance": 50}
-  - {"name": "🇯🇵 日本节点", "type": "url-test", "proxies": ["REJECT", "~(?:(日本|川日|东京|大阪|泉日|埼玉|沪日|深日|JP|Japan))|(?:🇯🇵)~u"], "url": "http://www.gstatic.com/generate_204", "interval": 300, "tolerance": 50}
-  - {"name": "🇺🇲 美国节点", "type": "url-test", "proxies": ["REJECT", "~(?:(美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|US|United States))|(?:🇺🇸|🇺🇲)~u"], "url": "http://www.gstatic.com/generate_204", "interval": 300, "tolerance": 150}
-  - {"name": "🇰🇷 韩国节点", "type": "url-test", "proxies": ["REJECT", "~(?:(KR|Korea|KOR|首尔|韩|韓))|(?:🇰🇷)~u"], "url": "http://www.gstatic.com/generate_204", "interval": 300, "tolerance": 50}
-  - {"name": "📲 电报消息", "type": "select", "proxies": ["🚀 默认代理", "🇭🇰 香港节点", "🇨🇳 台湾节点", "🇸🇬 新加坡节点", "🇯🇵 日本节点", "🇺🇲 美国节点", "🇰🇷 韩国节点", "DIRECT"]}
-  - {"name": "💬 Ai平台", "type": "select", "proxies": ["🇸🇬 新加坡节点", "🚀 默认代理", "🇭🇰 香港节点", "🇨🇳 台湾节点", "🇯🇵 日本节点", "🇺🇲 美国节点", "🇰🇷 韩国节点", "DIRECT"]}
-  - {"name": "📹 油管视频", "type": "select", "proxies": ["🇺🇲 美国节点", "🚀 默认代理", "🇭🇰 香港节点", "🇨🇳 台湾节点", "🇸🇬 新加坡节点", "🇯🇵 日本节点", "🇰🇷 韩国节点", "DIRECT"]}
-  - {"name": "🎥 奈飞视频", "type": "select", "proxies": ["🇺🇲 美国节点", "🚀 默认代理", "🇭🇰 香港节点", "🇨🇳 台湾节点", "🇸🇬 新加坡节点", "🇯🇵 日本节点", "🇰🇷 韩国节点", "DIRECT"]}
-  - {"name": "📺 巴哈姆特", "type": "select", "proxies": ["🇨🇳 台湾节点", "🚀 默认代理", "🇭🇰 香港节点", "🇸🇬 新加坡节点", "🇯🇵 日本节点", "🇺🇲 美国节点", "🇰🇷 韩国节点", "DIRECT"]}
-  - {"name": "📺 哔哩哔哩", "type": "select", "proxies": ["DIRECT", "🚀 默认代理", "🇭🇰 香港节点", "🇨🇳 台湾节点", "🇸🇬 新加坡节点", "🇯🇵 日本节点", "🇺🇲 美国节点", "🇰🇷 韩国节点"]}
-  - {"name": "🌍 国外媒体", "type": "select", "proxies": ["🚀 默认代理", "🇭🇰 香港节点", "🇨🇳 台湾节点", "🇸🇬 新加坡节点", "🇯🇵 日本节点", "🇺🇲 美国节点", "🇰🇷 韩国节点", "DIRECT"]}
-  - {"name": "📢 谷歌FCM", "type": "select", "proxies": ["DIRECT", "🚀 默认代理", "🇭🇰 香港节点", "🇨🇳 台湾节点", "🇸🇬 新加坡节点", "🇯🇵 日本节点", "🇺🇲 美国节点", "🇰🇷 韩国节点"]}
-  - {"name": "Ⓜ️ 微软Bing", "type": "select", "proxies": ["DIRECT", "🚀 默认代理", "🇭🇰 香港节点", "🇨🇳 台湾节点", "🇸🇬 新加坡节点", "🇯🇵 日本节点", "🇺🇲 美国节点", "🇰🇷 韩国节点"]}
-  - {"name": "Ⓜ️ 微软云盘", "type": "select", "proxies": ["DIRECT", "🚀 默认代理", "🇭🇰 香港节点", "🇨🇳 台湾节点", "🇸🇬 新加坡节点", "🇯🇵 日本节点", "🇺🇲 美国节点", "🇰🇷 韩国节点"]}
-  - {"name": "Ⓜ️ 微软服务", "type": "select", "proxies": ["DIRECT", "🚀 默认代理", "🇭🇰 香港节点", "🇨🇳 台湾节点", "🇸🇬 新加坡节点", "🇯🇵 日本节点", "🇺🇲 美国节点", "🇰🇷 韩国节点"]}
-  - {"name": "🍎 苹果服务", "type": "select", "proxies": ["DIRECT", "🚀 默认代理", "🇭🇰 香港节点", "🇨🇳 台湾节点", "🇸🇬 新加坡节点", "🇯🇵 日本节点", "🇺🇲 美国节点", "🇰🇷 韩国节点"]}
-  - {"name": "🎮 游戏平台", "type": "select", "proxies": ["DIRECT", "🚀 默认代理", "🇭🇰 香港节点", "🇨🇳 台湾节点", "🇸🇬 新加坡节点", "🇯🇵 日本节点", "🇺🇲 美国节点", "🇰🇷 韩国节点"]}
+  - {"name": "🇭🇰 香港地区", "type": "url-test", "proxies": ["REJECT", "~(?:(港|HK|hk|Hong Kong|HongKong|hongkong))|(?:🇭🇰)~u"], "url": "http://www.gstatic.com/generate_204", "interval": 1800, "tolerance": 50}
+  - {"name": "🇹🇼 台湾地区", "type": "url-test", "proxies": ["REJECT", "~(?:(台|新北|彰化|TW|Taiwan))|(?:🇹🇼)~u"], "url": "http://www.gstatic.com/generate_204", "interval": 1800, "tolerance": 50}
+  - {"name": "🇸🇬 新加坡地区", "type": "url-test", "proxies": ["REJECT", "~(?:(新加坡|坡|狮城|SG|Singapore))|(?:🇸🇬)~u"], "url": "http://www.gstatic.com/generate_204", "interval": 1800, "tolerance": 50}
+  - {"name": "🇯🇵 日本地区", "type": "url-test", "proxies": ["REJECT", "~(?:(日本|川日|东京|大阪|泉日|埼玉|沪日|深日|JP|Japan))|(?:🇯🇵)~u"], "url": "http://www.gstatic.com/generate_204", "interval": 1800, "tolerance": 50}
+  - {"name": "🇺🇸 美国地区", "type": "url-test", "proxies": ["REJECT", "~(?:(美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|US|United States))|(?:🇺🇸|🇺🇲)~u"], "url": "http://www.gstatic.com/generate_204", "interval": 1800, "tolerance": 150}
+  - {"name": "🇰🇷 韩国地区", "type": "url-test", "proxies": ["REJECT", "~(?:(KR|Korea|KOR|首尔|韩|韓))|(?:🇰🇷)~u"], "url": "http://www.gstatic.com/generate_204", "interval": 1800, "tolerance": 50}
+  - {"name": "📲 电报消息", "type": "select", "proxies": ["🚀 默认代理", "🇭🇰 香港地区", "🇹🇼 台湾地区", "🇸🇬 新加坡地区", "🇯🇵 日本地区", "🇺🇸 美国地区", "🇰🇷 韩国地区", "DIRECT"]}
+  - {"name": "💬 Ai平台", "type": "select", "proxies": ["🇸🇬 新加坡地区", "🚀 默认代理", "🇭🇰 香港地区", "🇹🇼 台湾地区", "🇯🇵 日本地区", "🇺🇸 美国地区", "🇰🇷 韩国地区", "DIRECT"]}
+  - {"name": "📹 油管视频", "type": "select", "proxies": ["🇺🇸 美国地区", "🚀 默认代理", "🇭🇰 香港地区", "🇹🇼 台湾地区", "🇸🇬 新加坡地区", "🇯🇵 日本地区", "🇰🇷 韩国地区", "DIRECT"]}
+  - {"name": "🎥 奈飞视频", "type": "select", "proxies": ["🇺🇸 美国地区", "🚀 默认代理", "🇭🇰 香港地区", "🇹🇼 台湾地区", "🇸🇬 新加坡地区", "🇯🇵 日本地区", "🇰🇷 韩国地区", "DIRECT"]}
+  - {"name": "📺 巴哈姆特", "type": "select", "proxies": ["🇹🇼 台湾地区", "🚀 默认代理", "🇭🇰 香港地区", "🇸🇬 新加坡地区", "🇯🇵 日本地区", "🇺🇸 美国地区", "🇰🇷 韩国地区", "DIRECT"]}
+  - {"name": "📺 哔哩哔哩", "type": "select", "proxies": ["DIRECT", "🚀 默认代理", "🇭🇰 香港地区", "🇹🇼 台湾地区", "🇸🇬 新加坡地区", "🇯🇵 日本地区", "🇺🇸 美国地区", "🇰🇷 韩国地区"]}
+  - {"name": "🌍 国外媒体", "type": "select", "proxies": ["🚀 默认代理", "🇭🇰 香港地区", "🇹🇼 台湾地区", "🇸🇬 新加坡地区", "🇯🇵 日本地区", "🇺🇸 美国地区", "🇰🇷 韩国地区", "DIRECT"]}
+  - {"name": "📢 谷歌FCM", "type": "select", "proxies": ["DIRECT", "🚀 默认代理", "🇭🇰 香港地区", "🇹🇼 台湾地区", "🇸🇬 新加坡地区", "🇯🇵 日本地区", "🇺🇸 美国地区", "🇰🇷 韩国地区"]}
+  - {"name": "Ⓜ️ 微软Bing", "type": "select", "proxies": ["DIRECT", "🚀 默认代理", "🇭🇰 香港地区", "🇹🇼 台湾地区", "🇸🇬 新加坡地区", "🇯🇵 日本地区", "🇺🇸 美国地区", "🇰🇷 韩国地区"]}
+  - {"name": "Ⓜ️ 微软云盘", "type": "select", "proxies": ["DIRECT", "🚀 默认代理", "🇭🇰 香港地区", "🇹🇼 台湾地区", "🇸🇬 新加坡地区", "🇯🇵 日本地区", "🇺🇸 美国地区", "🇰🇷 韩国地区"]}
+  - {"name": "Ⓜ️ 微软服务", "type": "select", "proxies": ["DIRECT", "🚀 默认代理", "🇭🇰 香港地区", "🇹🇼 台湾地区", "🇸🇬 新加坡地区", "🇯🇵 日本地区", "🇺🇸 美国地区", "🇰🇷 韩国地区"]}
+  - {"name": "🍎 苹果服务", "type": "select", "proxies": ["DIRECT", "🚀 默认代理", "🇭🇰 香港地区", "🇹🇼 台湾地区", "🇸🇬 新加坡地区", "🇯🇵 日本地区", "🇺🇸 美国地区", "🇰🇷 韩国地区"]}
+  - {"name": "🎮 游戏平台", "type": "select", "proxies": ["DIRECT", "🚀 默认代理", "🇭🇰 香港地区", "🇹🇼 台湾地区", "🇸🇬 新加坡地区", "🇯🇵 日本地区", "🇺🇸 美国地区", "🇰🇷 韩国地区"]}
   - {"name": "🛑 广告拦截", "type": "select", "proxies": ["REJECT", "DIRECT", "~(?!)~u"]}
   - {"name": "🍃 应用净化", "type": "select", "proxies": ["REJECT", "DIRECT", "~(?!)~u"]}
   - {"name": "🐟 其他流量", "type": "select", "proxies": ["🚀 默认代理", "DIRECT", "~(?!)~u"]}

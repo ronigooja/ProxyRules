@@ -20,17 +20,18 @@ SOURCE_AUTO_GROUP = "♻️ 自动选择"
 AUTO_GROUP = "♻️ 自动优选"
 MANUAL_GROUP = "🚀 手动选择"
 NO_NODES_PATTERN = "~(?!)~u"
+URL_TEST_INTERVAL = 30 * 60
 REGION_FLAGS = {
-    "🇭🇰 香港节点": "🇭🇰",
-    "🇯🇵 日本节点": "🇯🇵",
-    "🇺🇲 美国节点": "🇺🇸|🇺🇲",
-    "🇨🇳 台湾节点": "🇹🇼",
-    "🇸🇬 新加坡节点": "🇸🇬",
-    "🇰🇷 韩国节点": "🇰🇷",
+    "🇭🇰 香港地区": "🇭🇰",
+    "🇯🇵 日本地区": "🇯🇵",
+    "🇺🇸 美国地区": "🇺🇸|🇺🇲",
+    "🇹🇼 台湾地区": "🇹🇼",
+    "🇸🇬 新加坡地区": "🇸🇬",
+    "🇰🇷 韩国地区": "🇰🇷",
 }
 REGION_GROUPS = (
-    "🇭🇰 香港节点", "🇨🇳 台湾节点", "🇸🇬 新加坡节点",
-    "🇯🇵 日本节点", "🇺🇲 美国节点", "🇰🇷 韩国节点",
+    "🇭🇰 香港地区", "🇹🇼 台湾地区", "🇸🇬 新加坡地区",
+    "🇯🇵 日本地区", "🇺🇸 美国地区", "🇰🇷 韩国地区",
 )
 DISPLAY_FIRST = (PROXY_GROUP, AUTO_GROUP, MANUAL_GROUP, *REGION_GROUPS)
 DIRECT_GROUP = "🎯 全球直连"
@@ -38,10 +39,10 @@ REJECT_GROUP = "🛑 全球拦截"
 FINAL_GROUP = "🐟 其他流量"
 APP_DEFAULTS = {
     "📲 电报消息": PROXY_GROUP,
-    "💬 Ai平台": "🇸🇬 新加坡节点",
-    "📹 油管视频": "🇺🇲 美国节点",
-    "🎥 奈飞视频": "🇺🇲 美国节点",
-    "📺 巴哈姆特": "🇨🇳 台湾节点",
+    "💬 Ai平台": "🇸🇬 新加坡地区",
+    "📹 油管视频": "🇺🇸 美国地区",
+    "🎥 奈飞视频": "🇺🇸 美国地区",
+    "📺 巴哈姆特": "🇹🇼 台湾地区",
     "📺 哔哩哔哩": "DIRECT",
     "🌍 国外媒体": PROXY_GROUP,
     "📢 谷歌FCM": "DIRECT",
@@ -172,7 +173,7 @@ def arrange_proxy_groups(groups: list[dict]) -> list[dict]:
         if name == REMOVED_GROUP:
             continue
         if name == PROXY_GROUP:
-            group["items"] = ["[]" + item for item in (AUTO_GROUP, *REGION_GROUPS, MANUAL_GROUP, "DIRECT")]
+            group["items"] = ["[]" + item for item in (AUTO_GROUP, MANUAL_GROUP, *REGION_GROUPS, "DIRECT")]
         elif name in APP_DEFAULTS:
             default = APP_DEFAULTS[name]
             options = [PROXY_GROUP, *REGION_GROUPS, "DIRECT"]
@@ -186,6 +187,8 @@ def arrange_proxy_groups(groups: list[dict]) -> list[dict]:
             group["items"] = ["[]REJECT", "[]DIRECT"]
         elif name == FINAL_GROUP:
             group["items"] = ["[]" + PROXY_GROUP, "[]DIRECT"]
+        if group["type"] == "url-test":
+            group["interval"] = URL_TEST_INTERVAL
         result.append(group)
     return result
 
@@ -196,7 +199,13 @@ def rename_group(name: str) -> str:
         SOURCE_AUTO_GROUP: AUTO_GROUP,
         "🚀 模式选择": PROXY_GROUP,
         "🚀 默认出口": PROXY_GROUP,
-        "🇸🇬 狮城节点": "🇸🇬 新加坡节点",
+        "🇸🇬 狮城节点": "🇸🇬 新加坡地区",
+        '🇭🇰 香港节点': '🇭🇰 香港地区',
+        '🇨🇳 台湾节点': '🇹🇼 台湾地区',
+        '🇸🇬 新加坡节点': '🇸🇬 新加坡地区',
+        '🇯🇵 日本节点': '🇯🇵 日本地区',
+        '🇺🇲 美国节点': '🇺🇸 美国地区',
+        '🇰🇷 韩国节点': '🇰🇷 韩国地区',
         "♻️ 延迟优选": AUTO_GROUP,
         "🚀 手动切换": MANUAL_GROUP,
         "🐟 漏网之鱼": FINAL_GROUP,
