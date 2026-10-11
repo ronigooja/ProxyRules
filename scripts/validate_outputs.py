@@ -9,7 +9,8 @@ from pathlib import Path
 
 import yaml
 sys.dont_write_bytecode = True
-from build_rules import (AUTO_GROUP, DIRECT_GROUP, DISPLAY_FIRST, FINAL_GROUP,
+from build_rules import (APP_DEFAULTS, AUTO_GROUP, BLOCK_GROUPS, DIRECT_GROUP, DISPLAY_FIRST, FINAL_GROUP,
+                         MANUAL_GROUP, REGION_GROUPS, REMOVED_GROUP,
                          PROXY_GROUP, SOURCE_AUTO_GROUP, SOURCE_PROXY_GROUP,
                          read_custom_rules, read_rules, singbox_rule)
 
@@ -36,19 +37,49 @@ assert set(group_names) >= {PROXY_GROUP, FINAL_GROUP}
 assert DIRECT_GROUP not in group_names and "🛑 全球拦截" not in group_names
 groups = {group["name"]: group for group in clash["proxy-groups"]}
 assert "DIRECT" in groups[PROXY_GROUP]["proxies"]
+assert groups[PROXY_GROUP]["proxies"][-1] == "~(?!)~u"
+assert not re.search(groups[PROXY_GROUP]["proxies"][-1][1:-2], "Hong Kong 01")
 auto_group = groups[PROXY_GROUP]["proxies"][0]
 assert auto_group == AUTO_GROUP
 assert groups[auto_group]["type"] == "url-test"
 assert groups[auto_group]["proxies"] == []
-assert groups["🚀 手动切换"]["proxies"] == []
+assert groups[MANUAL_GROUP]["proxies"] == []
 assert set(group_names) >= {"💬 Ai平台", "🎥 奈飞视频", "🇭🇰 香港节点"}
 hong_kong = groups["🇭🇰 香港节点"]["proxies"]
-assert hong_kong[0] == "🚀 手动切换"
+assert hong_kong[0] == "REJECT"
 assert len(hong_kong) == 2 and hong_kong[1].startswith("~") and hong_kong[1].endswith("~u")
 assert re.search(hong_kong[1][1:-2], "Hong Kong 01")
 assert re.search(hong_kong[1][1:-2], "🇭🇰 01")
 assert not re.search(hong_kong[1][1:-2], "Japan 01")
-assert groups["🎥 奈飞节点"]["proxies"][0] == "🚀 手动切换"
+assert REMOVED_GROUP not in groups
+for name, default in APP_DEFAULTS.items():
+    assert groups[name]["type"] == "select"
+    assert groups[name]["proxies"][0] == default
+    assert set(groups[name]["proxies"]) == {PROXY_GROUP, *REGION_GROUPS, "DIRECT"}
+assert group_names[len(DISPLAY_FIRST):-3] == list(APP_DEFAULTS)
+assert group_names[-3:-1] == list(BLOCK_GROUPS)
+for name in (*BLOCK_GROUPS, FINAL_GROUP):
+    assert groups[name]["proxies"][-1] == "~(?!)~u"
+for group in groups.values():
+    assert all(member in groups or member in {"DIRECT", "REJECT"} or member.startswith("~") for member in group["proxies"])
+
+# Exercise the XBoard expansion behavior that originally injected nodes into
+# reference-only groups. Unlabelled nodes must still be available in every app.
+sample_nodes = ["Hong Kong 01", "🇭🇰 02", "Japan 01", "🇺🇸 01", "普通节点 01"]
+expanded = {}
+for name, group in groups.items():
+    filters = [member for member in group["proxies"] if member.startswith("~")]
+    refs = [member for member in group["proxies"] if not member.startswith("~")]
+    nodes = [node for node in sample_nodes if not filters or any(
+        re.search(pattern[1:-2], node) for pattern in filters)]
+    expanded[name] = refs + nodes
+for name in (PROXY_GROUP, *BLOCK_GROUPS, FINAL_GROUP):
+    assert not set(expanded[name]) & set(sample_nodes)
+for name, default in APP_DEFAULTS.items():
+    assert expanded[name][0] == default
+    assert set(sample_nodes) <= set(expanded[name])
+assert set(expanded["🇭🇰 香港节点"]) == {"REJECT", "Hong Kong 01", "🇭🇰 02"}
+assert MANUAL_GROUP not in expanded["🇭🇰 香港节点"]
 assert all("include-all" not in group and "filter" not in group for group in groups.values())
 assert groups[auto_group]["interval"] > 0
 assert groups[auto_group]["tolerance"] >= 0
@@ -111,7 +142,20 @@ assert {outbound["tag"] for outbound in singbox["outbounds"]} == set(group_names
 assert [outbound["tag"] for outbound in singbox["outbounds"][:len(DISPLAY_FIRST)]] == list(DISPLAY_FIRST)
 singbox_outbounds = {outbound["tag"]: outbound for outbound in singbox["outbounds"]}
 assert "direct" in singbox_outbounds[PROXY_GROUP]["outbounds"]
+assert singbox_outbounds[PROXY_GROUP]["include"] == "~(?!)~u"
 assert singbox_outbounds[auto_group]["type"] == "urltest"
+for name, default in APP_DEFAULTS.items():
+    outbound = singbox_outbounds[name]
+    assert outbound["default"] == ("direct" if default == "DIRECT" else default)
+    assert outbound["outbounds"][0] == outbound["default"]
+    assert set(outbound["outbounds"]) == {PROXY_GROUP, *REGION_GROUPS, "direct"}
+    assert "include" not in outbound
+for name in REGION_GROUPS:
+    outbound = singbox_outbounds[name]
+    assert outbound["include"] == groups[name]["proxies"][1]
+    assert outbound["fallback"] == "block"
+for name in (*BLOCK_GROUPS, FINAL_GROUP):
+    assert singbox_outbounds[name]["include"] == "~(?!)~u"
 for rule, policy in custom:
     converted = singbox_rule(rule, policy)
     if converted is not None:
@@ -150,6 +194,15 @@ for content in (surge, surfboard):
     assert f"{PROXY_GROUP} = select, {auto_group}," in content
     assert f"{FINAL_GROUP} = select, {PROXY_GROUP}," in content
     assert f"{DIRECT_GROUP} =" not in content
+    assert REMOVED_GROUP not in displayed
+    for name, default in APP_DEFAULTS.items():
+        line = next(line for line in content.splitlines() if line.startswith(name + " = "))
+        members = line.split(" = select, ", 1)[1].split(", ")
+        assert members[0] == default
+        assert set(members) == {PROXY_GROUP, *REGION_GROUPS, "DIRECT", "$proxy_group"}
+    for name in REGION_GROUPS:
+        line = next(line for line in content.splitlines() if line.startswith(name + " = "))
+        assert "include-all-proxies=true" in line and "policy-regex-filter=" in line
 for content in (surge, surfboard, shadow):
     for rule, _ in custom:
         if content is surfboard and rule.startswith("URL-REGEX,"):

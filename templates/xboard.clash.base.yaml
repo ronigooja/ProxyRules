@@ -21,11 +21,11 @@ dns:
   fake-ip-range: 198.18.0.1/16
   use-hosts: true
   nameserver:
-    - "https://dns.cloudflare.com/dns-query#♻️ 延迟优选"
-    - "https://dns.google/dns-query#♻️ 延迟优选"
+    - "https://dns.cloudflare.com/dns-query#♻️ 自动优选"
+    - "https://dns.google/dns-query#♻️ 自动优选"
   fallback:
-    - "https://dns.cloudflare.com/dns-query#♻️ 延迟优选"
-    - "https://dns.google/dns-query#♻️ 延迟优选"
+    - "https://dns.cloudflare.com/dns-query#♻️ 自动优选"
+    - "https://dns.google/dns-query#♻️ 自动优选"
   fallback-filter:
     geoip: true
     geoip-code: CN

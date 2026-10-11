@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import argparse
 import json
 import os
 from pathlib import Path
@@ -14,27 +15,46 @@ ACL_RAW = "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR"
 ACL_API = "https://api.github.com/repos/ACL4SSR/ACL4SSR/commits/master"
 CONFIG = "Clash/config/ACL4SSR_Online_Full.ini"
 SOURCE_PROXY_GROUP = "🚀 节点选择"
-PROXY_GROUP = "🚀 模式选择"
+PROXY_GROUP = "🚀 默认代理"
 SOURCE_AUTO_GROUP = "♻️ 自动选择"
-AUTO_GROUP = "♻️ 延迟优选"
-MANUAL_GROUP = "🚀 手动切换"
+AUTO_GROUP = "♻️ 自动优选"
+MANUAL_GROUP = "🚀 手动选择"
+NO_NODES_PATTERN = "~(?!)~u"
 REGION_FLAGS = {
     "🇭🇰 香港节点": "🇭🇰",
     "🇯🇵 日本节点": "🇯🇵",
     "🇺🇲 美国节点": "🇺🇸|🇺🇲",
     "🇨🇳 台湾节点": "🇹🇼",
-    "🇸🇬 狮城节点": "🇸🇬",
+    "🇸🇬 新加坡节点": "🇸🇬",
     "🇰🇷 韩国节点": "🇰🇷",
 }
-DISPLAY_FIRST = (
-    PROXY_GROUP, AUTO_GROUP, MANUAL_GROUP,
-    "🇭🇰 香港节点", "🇨🇳 台湾节点", "🇸🇬 狮城节点",
-    "🇯🇵 日本节点", "🇺🇲 美国节点", "🇰🇷 韩国节点", "🎥 奈飞节点",
+REGION_GROUPS = (
+    "🇭🇰 香港节点", "🇨🇳 台湾节点", "🇸🇬 新加坡节点",
+    "🇯🇵 日本节点", "🇺🇲 美国节点", "🇰🇷 韩国节点",
 )
+DISPLAY_FIRST = (PROXY_GROUP, AUTO_GROUP, MANUAL_GROUP, *REGION_GROUPS)
 DIRECT_GROUP = "🎯 全球直连"
 REJECT_GROUP = "🛑 全球拦截"
-FINAL_GROUP = "🐟 漏网之鱼"
-HIDDEN_GROUPS = {DIRECT_GROUP, REJECT_GROUP}
+FINAL_GROUP = "🐟 其他流量"
+APP_DEFAULTS = {
+    "📲 电报消息": PROXY_GROUP,
+    "💬 Ai平台": "🇸🇬 新加坡节点",
+    "📹 油管视频": "🇺🇲 美国节点",
+    "🎥 奈飞视频": "🇺🇲 美国节点",
+    "📺 巴哈姆特": "🇨🇳 台湾节点",
+    "📺 哔哩哔哩": "DIRECT",
+    "🌍 国外媒体": PROXY_GROUP,
+    "📢 谷歌FCM": "DIRECT",
+    "Ⓜ️ 微软Bing": "DIRECT",
+    "Ⓜ️ 微软云盘": "DIRECT",
+    "Ⓜ️ 微软服务": "DIRECT",
+    "🍎 苹果服务": "DIRECT",
+    "🎮 游戏平台": "DIRECT",
+}
+BLOCK_GROUPS = ("🛑 广告拦截", "🍃 应用净化")
+REMOVED_GROUP = "🎥 奈飞节点"
+FIXED_DIRECT_GROUPS = {"🌏 国内媒体", "🎶 网易音乐"}
+HIDDEN_GROUPS = {DIRECT_GROUP, REJECT_GROUP, *FIXED_DIRECT_GROUPS}
 RULE_TYPES = {
     "DOMAIN", "DOMAIN-SUFFIX", "DOMAIN-KEYWORD", "IP-CIDR", "IP-CIDR6",
     "PROCESS-NAME", "URL-REGEX",
@@ -135,28 +155,76 @@ def read_proxy_groups(config: str) -> list[dict]:
         for item in group["items"]:
             if item.startswith("[]") and item[2:] not in names | {"DIRECT", "REJECT"}:
                 raise ValueError(f"unknown upstream proxy group reference: {item}")
-    return groups
+    return arrange_proxy_groups(groups)
+
+
+def arrange_proxy_groups(groups: list[dict]) -> list[dict]:
+    """Keep upstream rules, but give each visible group an explicit purpose."""
+    known = set(DISPLAY_FIRST) | set(APP_DEFAULTS) | set(BLOCK_GROUPS) | HIDDEN_GROUPS | {FINAL_GROUP, REMOVED_GROUP}
+    names = {group["name"] for group in groups}
+    missing = known - names - {REJECT_GROUP}
+    if names - known or missing:
+        raise ValueError(f"update group mapping: added={sorted(names - known)}, missing={sorted(missing)}")
+    result = []
+    for source in groups:
+        group = {**source, "items": source["items"].copy()}
+        name = group["name"]
+        if name == REMOVED_GROUP:
+            continue
+        if name == PROXY_GROUP:
+            group["items"] = ["[]" + item for item in (AUTO_GROUP, *REGION_GROUPS, MANUAL_GROUP, "DIRECT")]
+        elif name in APP_DEFAULTS:
+            default = APP_DEFAULTS[name]
+            options = [PROXY_GROUP, *REGION_GROUPS, "DIRECT"]
+            # Clients without a selector default field use the first member.
+            options.remove(default)
+            options.insert(0, default)
+            group.update(type="select", items=["[]" + item for item in options] + [".*"], default=default)
+        elif name in FIXED_DIRECT_GROUPS:
+            group["items"] = ["[]DIRECT"]
+        elif name in BLOCK_GROUPS:
+            group["items"] = ["[]REJECT", "[]DIRECT"]
+        elif name == FINAL_GROUP:
+            group["items"] = ["[]" + PROXY_GROUP, "[]DIRECT"]
+        result.append(group)
+    return result
 
 
 def rename_group(name: str) -> str:
     return {
         SOURCE_PROXY_GROUP: PROXY_GROUP,
         SOURCE_AUTO_GROUP: AUTO_GROUP,
+        "🚀 模式选择": PROXY_GROUP,
+        "🚀 默认出口": PROXY_GROUP,
+        "🇸🇬 狮城节点": "🇸🇬 新加坡节点",
+        "♻️ 延迟优选": AUTO_GROUP,
+        "🚀 手动切换": MANUAL_GROUP,
+        "🐟 漏网之鱼": FINAL_GROUP,
     }.get(name, name)
 
 
 def display_order(groups: list[dict]) -> list[dict]:
     """Put frequently used groups first without changing their members."""
     first = {name: index for index, name in enumerate(DISPLAY_FIRST)}
-    return sorted(groups, key=lambda group: (
-        2 if group["name"] == FINAL_GROUP else 0 if group["name"] in first else 1,
-        first.get(group["name"], 0),
-    ))
+    apps = {name: index for index, name in enumerate(APP_DEFAULTS)}
+    blocks = {name: index for index, name in enumerate(BLOCK_GROUPS)}
+
+    def order(group: dict) -> tuple[int, int]:
+        name = group["name"]
+        if name in first:
+            return 0, first[name]
+        if name in apps:
+            return 1, apps[name]
+        if name in blocks:
+            return 2, blocks[name]
+        return 3, 0
+
+    return sorted(groups, key=order)
 
 
 def policy_name(name: str, client: str = "clash") -> str:
     name = rename_group(name)
-    if name in (DIRECT_GROUP, "DIRECT"):
+    if name in {DIRECT_GROUP, "DIRECT", *FIXED_DIRECT_GROUPS}:
         return "direct" if client == "singbox" else "DIRECT"
     if name in (REJECT_GROUP, "REJECT"):
         return "block" if client == "singbox" else "REJECT"
@@ -164,7 +232,7 @@ def policy_name(name: str, client: str = "clash") -> str:
 
 
 def shadow_policy(name: str, groups: dict[str, dict], seen: frozenset[str] = frozenset()) -> str:
-    if name == DIRECT_GROUP or name == "DIRECT":
+    if name in {DIRECT_GROUP, "DIRECT", *FIXED_DIRECT_GROUPS}:
         return "DIRECT"
     if name == REJECT_GROUP or name == "REJECT":
         return "REJECT"
@@ -177,30 +245,37 @@ def shadow_policy(name: str, groups: dict[str, dict], seen: frozenset[str] = fro
     return shadow_policy(first[2:], groups, seen | {name})
 
 
+def node_expression(group: dict) -> str | None:
+    patterns = [group["items"][0]] if group["type"] == "url-test" else [item for item in group["items"] if not item.startswith("[]")]
+    if not patterns:
+        return None
+    expression = "|".join(f"(?:{pattern})" for pattern in patterns)
+    if group["name"] in REGION_FLAGS:
+        expression += "|(?:" + REGION_FLAGS[group["name"]] + ")"
+    if "~" in expression:
+        raise ValueError(f"unsupported XBoard regex delimiter in {group['name']}")
+    return expression
+
+
 def clash_proxy_groups(groups: list[dict]) -> list[dict]:
     result = []
     for group in groups:
         if group["name"] in HIDDEN_GROUPS:
             continue
         members = [policy_name(item[2:]) for item in group["items"] if item.startswith("[]")]
-        if group["type"] == "url-test":
-            patterns = [group["items"][0]]
-        else:
-            patterns = [item for item in group["items"] if not item.startswith("[]")]
-        if patterns:
+        expression = node_expression(group)
+        if expression is not None:
             # XBoard expands regex entries in proxies against the user's nodes.
             # Its subscription handler does not apply Mihomo's filter field.
-            expression = "|".join(f"(?:{pattern})" for pattern in patterns)
-            if group["name"] in REGION_FLAGS:
-                expression += "|(?:" + REGION_FLAGS[group["name"]] + ")"
-            if "~" in expression:
-                raise ValueError(f"unsupported XBoard regex delimiter in {group['name']}")
             if not members and expression != "(?:.*)":
-                # Keep referenced filtered groups present when a user has no
-                # matching nodes; the manual group still supplies a proxy.
-                members.append(MANUAL_GROUP)
+                # Keep the group present without allowing a different region
+                # to win its latency test. REJECT never provides connectivity.
+                members.append("REJECT")
             if expression != "(?:.*)":
                 members.append(f"~{expression}~u")
+        else:
+            # XBoard otherwise appends every subscription node to this group.
+            members.append(NO_NODES_PATTERN)
         entry = {"name": group["name"], "type": group["type"], "proxies": members}
         if group["type"] == "url-test":
             entry.update({"url": group["items"][1], "interval": group["interval"],
@@ -218,7 +293,15 @@ def surge_proxy_groups(groups: list[dict]) -> str:
             members = [policy_name(item[2:]) if item.startswith("[]") else "$proxy_group"
                        for item in group["items"]]
         else:
-            members = ["$proxy_group", f"url={group['items'][1]}",
+            expression = node_expression(group)
+            if expression == "(?:.*)":
+                members = ["$proxy_group"]
+            else:
+                # Regex filtering applies to dynamically included proxies,
+                # not to explicitly listed policies.
+                members = ["REJECT", "include-all-proxies=true",
+                           'policy-regex-filter=".*(?:' + expression + ').*"']
+            members += [f"url={group['items'][1]}",
                        f"interval={group['interval']}", f"tolerance={group['tolerance']}"]
         lines.append(f"{group['name']} = {group['type']}, " + ", ".join(members))
     return "\n".join(lines)
@@ -233,6 +316,14 @@ def singbox_proxy_groups(groups: list[dict]) -> list[dict]:
                    for item in group["items"] if item.startswith("[]")]
         outbound = {"type": "selector" if group["type"] == "select" else "urltest",
                     "tag": group["name"], "outbounds": members}
+        expression = node_expression(group)
+        if expression is None:
+            outbound["include"] = NO_NODES_PATTERN
+        elif expression != "(?:.*)":
+            outbound["include"] = f"~{expression}~u"
+            outbound["fallback"] = "block"
+        if "default" in group:
+            outbound["default"] = policy_name(group["default"], "singbox")
         if group["type"] == "url-test":
             outbound["url"] = group["items"][1]
             outbound["interval"] = f"{group['interval']}s"
@@ -328,12 +419,12 @@ def surge_dns_hosts(rules: list[str]) -> list[str]:
     return hosts
 
 
-def build() -> dict[Path, str]:
+def build(revision: str | None = None) -> dict[Path, str]:
     personal_path = ROOT / "Rules/Personal.list"
     personal = read_rules(personal_path.read_text(encoding="utf-8"), str(personal_path))
     custom_path = ROOT / "Rules/Custom.list"
     custom = read_custom_rules(custom_path.read_text(encoding="utf-8"), str(custom_path))
-    revision = json.loads(fetch(ACL_API))["sha"]
+    revision = revision or json.loads(fetch(ACL_API))["sha"]
     if len(revision) != 40 or any(c not in "0123456789abcdef" for c in revision):
         raise ValueError("invalid ACL4SSR revision")
     config = fetch(f"{ACL_RAW}/{revision}/{CONFIG}")
@@ -468,7 +559,10 @@ def build() -> dict[Path, str]:
 
 
 def main() -> None:
-    outputs = build()  # Validate every download before replacing any output.
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--revision", help="Rebuild a specific ACL4SSR commit instead of updating rules")
+    args = parser.parse_args()
+    outputs = build(args.revision)  # Validate every download before replacing any output.
     for path, content in outputs.items():
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(content, encoding="utf-8", newline="\n")
