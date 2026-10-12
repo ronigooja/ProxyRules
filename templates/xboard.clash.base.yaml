@@ -16,29 +16,16 @@ dns:
   proxy-server-nameserver:
     - https://223.5.5.5/dns-query#DIRECT
   direct-nameserver:
-    - https://dns.alidns.com/dns-query#DIRECT
+    - https://223.5.5.5/dns-query#DIRECT
+  direct-nameserver-follow-policy: false
   enhanced-mode: fake-ip
   fake-ip-range: 198.18.0.1/16
   use-hosts: true
+  nameserver-policy:
+{{DNS_POLICIES}}
   nameserver:
-    - "https://dns.cloudflare.com/dns-query#♻️ 自动优选"
-    - "https://dns.google/dns-query#♻️ 自动优选"
-  fallback:
-    - "https://dns.cloudflare.com/dns-query#♻️ 自动优选"
-    - "https://dns.google/dns-query#♻️ 自动优选"
-  fallback-filter:
-    geoip: true
-    geoip-code: CN
-    ipcidr:
-      - 0.0.0.0/8
-      - 10.0.0.0/8
-      - 100.64.0.0/10
-      - 127.0.0.0/8
-      - 169.254.0.0/16
-      - 172.16.0.0/12
-      - 192.168.0.0/16
-      - 224.0.0.0/4
-      - 240.0.0.0/4
+    - "https://1.1.1.1/dns-query#🐟 其他流量"
+    - "https://8.8.8.8/dns-query#🐟 其他流量"
   fake-ip-filter:
     - "*.lan"
     - "*.local"
@@ -55,6 +42,9 @@ dns:
     - "*.*.xboxlive.com"
     - "+.msftncsi.com"
     - "+.msftconnecttest.com"
+
+rule-providers:
+{{DNS_RULE_PROVIDERS}}
 
 proxies:
 

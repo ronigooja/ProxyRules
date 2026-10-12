@@ -48,11 +48,19 @@ Sing-box 模板沿用 `block` 出站。已查看的 XBoard 上游代码在适配
 
 Clash 文件由 `Rules/Personal.list` 生成，无需单独编辑。使用时为规则集指定 `DIRECT`。Shadowrocket 配置包含个人规则链接；XBoard 模板只合并 `Rules/Custom.list`，个人规则链接可按需补充。
 
-Shadowrocket 完整规则配置：`https://raw.githubusercontent.com/ronigooja/ProxyRules/main/Shadowrocket/nodnsleak-pk.ini`。其中不含节点，DNS 使用阿里 DoH，IPv6 已开启；实际 DNS 行为取决于设备和客户端设置。
+Shadowrocket 完整规则配置：`https://raw.githubusercontent.com/ronigooja/ProxyRules/main/Shadowrocket/nodnsleak-pk.ini`。其中不含节点，代理 DNS 使用 Cloudflare／Google IP DoH 并指定 `#proxy`，直连域名及节点地址使用阿里 IP DoH，IPv6 已开启；实际 DNS 行为仍需对应客户端版本验证。
 
-DNS 出口要求见 [AGENTS.md](AGENTS.md)。[Surfboard 官方配置文档](https://getsurfboard.com/docs/profile-format/general/doh_server)说明 DoH 查询目前默认直连，未提供指定 DoH 代理出口的配置项。因此 Surfboard 模板中的阿里 DoH 只覆盖直连侧，不能保证代理流量按本仓库要求经代理使用 Cloudflare／Google DoH。需要严格按此要求使用时，请选用 Clash Meta（Mihomo）配置，并在客户端自行启用所需的流量接管功能。
+DNS 出口要求见 [AGENTS.md](AGENTS.md)：全部使用 IP 形式的 DoH 地址（阿里 `https://223.5.5.5/dns-query`、Cloudflare `https://1.1.1.1/dns-query`、Google `https://8.8.8.8/dns-query`）。代理 DNS 必须跟随业务连接实际使用的节点，直连 DNS 使用阿里并直连。
 
-Sing-box 的 DNS 直连例外按固定域名规则生成，尚未随应用组实时选择切换。应用组选 DIRECT 时，相关域名仍可能通过代理向 Cloudflare／Google DoH 查询；默认直连应用改选代理时也不能保证 DNS 路径同步改变。这不满足本仓库要求的动态出口对应关系，不能仅凭代理组配置认定所有客户端均已实现 DNS 目标。
+Clash／Clash Meta 现按域名分流规则的原始顺序生成 DNS 策略，Cloudflare／Google 查询绑定对应业务组；固定 DIRECT 域名使用阿里直连。未命中域名规则的查询绑定其他流量组，取消原来统一使用自动优选的 DNS 与备用出口。该配置使用 Mihomo 的 inline classical rule-provider 扩展，旧 Clash 内核不能假定兼容。
+
+Sing-box 同样按原始顺序为业务域名选择 DNS 服务器，服务器的 `detour` 绑定对应业务组，包含先于直连后缀的代理例外。代理侧默认查询绑定其他流量组，全局代理模式的 DNS 绑定默认代理组。
+
+**这些修改尚未满足完整的同节点要求。** 官方 Mihomo 1.19.32 实测：新建查询连接可经过应用组选中的节点，但切换节点后可能复用旧节点的 DoH 连接；应用组选 DIRECT 后，普通真实 DNS 查询仍使用 Cloudflare／Google，而非自动切换到阿里。`direct-nameserver` 只处理对应的直连出口解析，不覆盖所有提前发生的 DNS 查询。Sing-box 的静态 DNS 规则也不能按组选 DIRECT 自动改变解析器。按目标 IP、进程等分流时，不能仅根据 DNS 中的域名确定最终业务出口。
+
+逐客户端的依据及实测方法见 [DNS 查询出口审计](docs/dns-routing.md)。校验脚本检查规则顺序、业务组绑定及 IP DoH 地址，不把通过结构校验表述为完整运行时出口保证。此前直接阻断所有客户端发布的硬编码检查已撤掉，本次没有调用远端发布 API。
+
+Stash、Surge 仍通过 DNS 服务器 IP 的规则指定查询出口，未实现继承业务节点；[Surfboard 官方配置文档](https://getsurfboard.com/docs/profile-format/general/doh_server)说明 DoH 查询当前默认 DIRECT，未提供按业务节点指定查询出口的配置。因此这些客户端不能当作已经满足仓库 DNS 要求。
 
 ## XBoard 模板更新
 

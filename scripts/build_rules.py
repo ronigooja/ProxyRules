@@ -359,8 +359,36 @@ def pack_singbox_rules(rules: list[dict]) -> list[dict]:
     return packed
 
 
-def singbox_dns_rules(rules: list[dict]) -> list[dict]:
-    """Keep only direct-domain exceptions; the DNS final is the remote server."""
+def clash_dns_policies(rules: list[str]) -> tuple[dict, dict]:
+    """Bind the ordered domain-rule projection to its own outbound group.
+
+    Separate contiguous policy runs preserve overlapping rules and keywords;
+    grouping all rules by policy would change first-match precedence.
+    """
+    runs: list[tuple[str, list[str]]] = []
+    for rule in rules:
+        parts = rule.split(",")
+        if parts[0] not in ("DOMAIN", "DOMAIN-SUFFIX", "DOMAIN-KEYWORD"):
+            continue
+        policy = parts[2]
+        matcher = ",".join(parts[:2])
+        if runs and runs[-1][0] == policy:
+            runs[-1][1].append(matcher)
+        else:
+            runs.append((policy, [matcher]))
+    policies, providers = {}, {}
+    for index, (policy, matchers) in enumerate(runs):
+        name = f"dns-policy-{index:03d}"
+        providers[name] = {"type": "inline", "behavior": "classical", "payload": matchers}
+        policies["rule-set:" + name] = (
+            ["https://223.5.5.5/dns-query#DIRECT"] if policy == "DIRECT" else
+            [f"https://1.1.1.1/dns-query#{policy}", f"https://8.8.8.8/dns-query#{policy}"]
+        )
+    return policies, providers
+
+
+def singbox_dns_rules(rules: list[dict], servers: dict[str, str]) -> list[dict]:
+    """Project every domain rule in order, including proxy exceptions."""
     dns_rules = []
     for rule in rules:
         matcher = {key: value for key, value in rule.items()
@@ -368,13 +396,15 @@ def singbox_dns_rules(rules: list[dict]) -> list[dict]:
         if not matcher:
             continue
         outbound = rule.get("outbound")
-        if outbound not in ("direct", DIRECT_GROUP):
-            continue
-        dns_rules.append({**matcher, "server": "local"})
+        if outbound == "block":
+            dns_rules.append({**matcher, "action": "reject"})
+        else:
+            dns_rules.append({**matcher, "server": servers[outbound]})
     packed = []
     for rule in dns_rules:
-        fields = [key for key in rule if key != "server"]
-        if (packed and len(fields) == 1 and packed[-1].get("server") == rule["server"]
+        fields = [key for key in rule if key not in ("server", "action")]
+        if (packed and len(fields) == 1 and packed[-1].get("server") == rule.get("server")
+                and packed[-1].get("action") == rule.get("action")
                 and set(packed[-1]) == set(rule)):
             packed[-1][fields[0]].extend(rule[fields[0]])
         else:
@@ -408,13 +438,13 @@ def surge_dns_hosts(rules: list[str]) -> list[str]:
         if kind == "DOMAIN-KEYWORD":
             continue
         if policy == "DIRECT":
-            server = "https://dns.alidns.com/dns-query"
+            server = "https://223.5.5.5/dns-query"
         elif (policy not in ("REJECT", "🛑 广告拦截", "🍃 应用净化")
               and any(
                   value == suffix or value.endswith("." + suffix)
                   for suffix in direct_suffixes)):
             # These proxy rules precede broader direct suffixes such as .cn.
-            server = "https://dns.cloudflare.com/dns-query"
+            server = "https://1.1.1.1/dns-query"
         else:
             continue
         if policy == "DIRECT":
@@ -527,9 +557,27 @@ def build(revision: str | None = None) -> dict[Path, str]:
             raise ValueError(f"{name} base must contain one {{PROXY_GROUPS}} marker")
     if surge_base.count("{{DNS_HOSTS}}") != 1:
         raise ValueError("Surge base must contain one {DNS_HOSTS} marker")
+    for marker in ("{{DNS_POLICIES}}", "{{DNS_RULE_PROVIDERS}}"):
+        if clash_base.count(marker) != 1:
+            raise ValueError(f"Clash base must contain one {marker} marker")
     singbox = json.loads((ROOT / "templates/xboard.singbox.base.json").read_text(encoding="utf-8"))
     packed_singbox_rules = pack_singbox_rules(singbox_rules)
-    singbox["dns"]["rules"].extend(singbox_dns_rules(packed_singbox_rules))
+    dns_server_tags = {"direct": "local", FINAL_GROUP: "remote"}
+    needed_dns_outbounds = {PROXY_GROUP} | {
+        rule["outbound"] for rule in packed_singbox_rules
+        if any(field in rule for field in ("domain", "domain_suffix", "domain_keyword"))
+    }
+    for index, group in enumerate(groups):
+        name = group["name"]
+        if name in HIDDEN_GROUPS or name == FINAL_GROUP or name not in needed_dns_outbounds:
+            continue
+        tag = f"dns-outbound-{index:03d}"
+        dns_server_tags[name] = tag
+        singbox["dns"]["servers"].append({
+            "tag": tag, "type": "https", "server": "1.1.1.1", "detour": name,
+        })
+    singbox["dns"]["rules"][1]["server"] = dns_server_tags[PROXY_GROUP]
+    singbox["dns"]["rules"].extend(singbox_dns_rules(packed_singbox_rules, dns_server_tags))
     singbox["route"]["rules"].extend(packed_singbox_rules)
     singbox["outbounds"] = singbox_proxy_groups(groups) + [
         outbound for outbound in singbox["outbounds"] if outbound["tag"] in ("direct", "block")]
@@ -537,6 +585,13 @@ def build(revision: str | None = None) -> dict[Path, str]:
     shadow_base = (ROOT / "templates/shadowrocket.base.ini").read_text(encoding="utf-8")
     if shadow_base.count("{{RULES}}") != 1:
         raise ValueError("Shadowrocket base must contain one {{RULES}} marker")
+    dns_policies, dns_providers = clash_dns_policies(clash_rules)
+    clash_base = clash_base.replace("{{DNS_POLICIES}}", "\n".join(
+        "    " + json.dumps(key, ensure_ascii=False) + ": " + json.dumps(value, ensure_ascii=False)
+        for key, value in dns_policies.items()))
+    clash_base = clash_base.replace("{{DNS_RULE_PROVIDERS}}", "\n".join(
+        "  " + json.dumps(key) + ": " + json.dumps(value, ensure_ascii=False)
+        for key, value in dns_providers.items()))
     clash = clash_base.replace("{{PROXY_GROUPS}}", "\n".join(
         "  - " + json.dumps(group, ensure_ascii=False) for group in clash_proxy_groups(groups))) + "\n".join(
         "  - " + json.dumps(rule, ensure_ascii=False) for rule in clash_rules) + "\n"
@@ -544,9 +599,9 @@ def build(revision: str | None = None) -> dict[Path, str]:
     stash = stash_base.replace("{{PROXY_GROUPS}}", "\n".join(
         "  - " + json.dumps(group, ensure_ascii=False) for group in clash_proxy_groups(groups))) + "\n".join(
         "  - " + json.dumps(rule, ensure_ascii=False) for rule in [
-            f"DOMAIN,dns.cloudflare.com,{AUTO_GROUP}",
-            f"DOMAIN,dns.google,{AUTO_GROUP}",
-            "DOMAIN,dns.alidns.com,DIRECT",
+            f"IP-CIDR,1.1.1.1/32,{AUTO_GROUP}",
+            f"IP-CIDR,8.8.8.8/32,{AUTO_GROUP}",
+            "IP-CIDR,223.5.5.5/32,DIRECT",
         ] + clash_rules) + "\n"
     surge = (surge_base.replace("{{PROXY_GROUPS}}", surge_proxy_groups(groups))
              .replace("{{DNS_HOSTS}}", "\n".join(surge_dns_hosts(surge_rules)))
