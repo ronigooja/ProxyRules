@@ -73,7 +73,7 @@ def fetch(url: str) -> str:
         return response.read().decode("utf-8-sig")
 
 
-def read_rules(text: str, source: str) -> list[str]:
+def read_rules(text: str, source: str, *, allow_empty: bool = False) -> list[str]:
     rules = []
     for number, raw in enumerate(text.splitlines(), 1):
         rule = raw.strip()
@@ -83,7 +83,7 @@ def read_rules(text: str, source: str) -> list[str]:
         if parts[0] not in RULE_TYPES or len(parts) < 2 or not parts[1].strip():
             raise ValueError(f"{source}:{number}: invalid rule: {rule}")
         rules.append(rule)
-    if not rules:
+    if not rules and not allow_empty:
         raise ValueError(f"{source}: empty ruleset")
     return rules
 
@@ -474,7 +474,7 @@ def read_personal_routes(text: str, source: str) -> list[str]:
 
 def build_personal() -> dict[Path, str]:
     direct_path = ROOT / "Rules/Personal.list"
-    direct = read_rules(direct_path.read_text(encoding="utf-8"), str(direct_path))
+    direct = read_rules(direct_path.read_text(encoding="utf-8"), str(direct_path), allow_empty=True)
     routes_path = ROOT / "Rules/Personal.routes.list"
     routes = read_personal_routes(routes_path.read_text(encoding="utf-8"), str(routes_path))
     rules = routes + [with_policy(rule, "DIRECT") for rule in direct]

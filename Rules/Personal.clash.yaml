@@ -1,4 +1,10 @@
 rules:
+  - "IP-CIDR,45.45.217.235/32,kunmingguanduqianyunhui8f221-ufi003,no-resolve"
+  - "IP-CIDR,154.19.187.117/32,kunmingguanduqianyunhui8f221-ufi003,no-resolve"
   - "IP-CIDR,38.47.101.8/32,kunmingguanduqianyunhui8f221-ufi003,no-resolve"
-  - "IP-CIDR,154.19.187.117/32,DIRECT,no-resolve"
-  - "IP-CIDR,45.45.217.235/32,DIRECT,no-resolve"
+  - "IP-CIDR,38.207.165.47/32,kunmingguanduqianyunhui8f221-ufi003,no-resolve"
+  - "IP-CIDR,50.114.114.252/32,kunmingguanduqianyunhui8f221-ufi003,no-resolve"
+  - "IP-CIDR,23.27.1.241/32,kunmingguanduqianyunhui8f221-ufi003,no-resolve"
+  - "IP-CIDR,70.39.178.189/32,kunmingguanduqianyunhui8f221-ufi003,no-resolve"
+  - "IP-CIDR,144.202.108.129/32,kunmingguanduqianyunhui8f221-ufi003,no-resolve"
+  - "IP-CIDR,64.118.131.42/32,kunmingguanduqianyunhui8f221-ufi003,no-resolve"

@@ -30,7 +30,7 @@ shadow = (ROOT / "Shadowrocket/nodnsleak-pk.ini").read_text(encoding="utf-8")
 custom_path = ROOT / "Rules/Custom.list"
 custom = read_custom_rules(custom_path.read_text(encoding="utf-8"), str(custom_path))
 personal_list = (ROOT / "Rules/Personal.list").read_text(encoding="utf-8")
-personal_rules = read_rules(personal_list, "Rules/Personal.list")
+personal_rules = read_rules(personal_list, "Rules/Personal.list", allow_empty=True)
 personal_routes = read_personal_routes((ROOT / "Rules/Personal.routes.list").read_text(encoding="utf-8"), "Rules/Personal.routes.list")
 
 assert isinstance(clash.get("proxy-groups"), list)
