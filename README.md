@@ -41,12 +41,36 @@ Sing-box 模板沿用 `block` 出站。已查看的 XBoard 上游代码在适配
 
 ## 独立规则链接
 
-独立的个人规则在 [Rules/Personal.list](Rules/Personal.list)，收录原 `DirectIP.list` 的两个 IP 直连规则，不含策略字段，可作为客户端的补充规则集：
+[Rules/Personal.clash.yaml](Rules/Personal.clash.yaml) 是供 Nagi 一次导入的完整 Mihomo 规则文件，使用 `rules:` 列表，每条规则自带出口：
 
-- Surge、Shadowrocket：`https://raw.githubusercontent.com/ronigooja/ProxyRules/main/Rules/Personal.list`
-- Clash、Clash Meta（classical rule-provider）：`https://raw.githubusercontent.com/ronigooja/ProxyRules/main/Rules/Personal.clash.yaml`
+- `38.47.101.8/32` → `kunmingguanduqianyunhui8f221-ufi003`
+- `154.19.187.117/32`、`45.45.217.235/32` → `DIRECT`
 
-Clash 文件由 `Rules/Personal.list` 生成，无需单独编辑。使用时为规则集指定 `DIRECT`。Shadowrocket 配置包含个人规则链接；XBoard 模板只合并 `Rules/Custom.list`，个人规则链接可按需补充。
+指定出口规则在 [Rules/Personal.routes.list](Rules/Personal.routes.list) 中维护，格式为 `TYPE,value,节点名或策略组名[,no-resolve]`。原有直连规则在 [Rules/Personal.list](Rules/Personal.list) 中维护，保持不含策略字段，以供 Surge、Shadowrocket 引用并指定 `DIRECT`。生成器先写入指定出口规则，再将直连规则补上 `DIRECT` 合并到同一个 YAML。
+
+修改源文件后执行 `python3 scripts/build_rules.py --personal-only` 即可生成，不下载上游规则。完整生成及月度工作流也会更新此文件。XBoard 模板只合并 `Rules/Custom.list`；Shadowrocket 配置只包含个人直连规则链接 `https://raw.githubusercontent.com/ronigooja/ProxyRules/main/Rules/Personal.list`。
+
+在 Nagi 的 **Rules → Import**（终端菜单显示为 **Settings & Maintenance → Routing Rules → Import rule file**）中填写：
+
+| 字段 | 值 |
+| --- | --- |
+| Rule file format | `Full rules (targets in file)` |
+| Import name | `personal` |
+| Local file path or HTTP(S) URL | `https://raw.githubusercontent.com/ronigooja/ProxyRules/main/Rules/Personal.clash.yaml` |
+
+不需要填写统一 Target；节点 `kunmingguanduqianyunhui8f221-ufi003` 必须存在于当前有效配置。对应 CLI 命令：
+
+```sh
+nagi rules import personal rules https://raw.githubusercontent.com/ronigooja/ProxyRules/main/Rules/Personal.clash.yaml
+```
+
+**旧格式迁移：** `Personal.clash.yaml` 已从 `payload:` 规则集改为 `rules:` 完整规则，导入时应选择 `rules`，不能继续通过 classical rule-provider 或 `RULE-SET` 引用。若此前在 Nagi 导入了 `personal-proxy`、`personal-direct` 或其他旧个人规则集，先在 **Manage Rules and Sets** 中删除旧对象，再统一导入 `personal`，避免旧规则优先命中。
+
+Nagi 将远程规则保存为本地快照，并置于订阅规则之前；远端更新后不会自动刷新，需要删除已导入的 `personal` 后重新导入（`nagi rules remove personal`）。相同名称不能重复导入。以上远程链接需在文件提交并推送到 `main` 后使用；推送前可直接导入本地文件：
+
+```sh
+nagi rules import personal rules /root/ProxyRules/Rules/Personal.clash.yaml
+```
 
 Shadowrocket 完整规则配置：`https://raw.githubusercontent.com/ronigooja/ProxyRules/main/Shadowrocket/nodnsleak-pk.ini`。其中不含节点，代理 DNS 使用 Cloudflare／Google IP DoH 并指定 `#proxy`，直连域名及节点地址使用阿里 IP DoH，IPv6 已开启；实际 DNS 行为仍需对应客户端版本验证。
 

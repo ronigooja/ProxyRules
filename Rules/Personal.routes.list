@@ -1,0 +1,6 @@
+# NAME: Personal routes
+# 私人指定出口规则；不并入 XBoard 基础模板。
+# 格式：TYPE,value,节点名或策略组名[,no-resolve]
+# 与 Personal.list 的 DIRECT 规则一起生成 Personal.clash.yaml。
+
+IP-CIDR,38.47.101.8/32,kunmingguanduqianyunhui8f221-ufi003,no-resolve

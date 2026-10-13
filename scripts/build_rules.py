@@ -460,9 +460,31 @@ def surge_dns_hosts(rules: list[str]) -> list[str]:
     return hosts
 
 
+def read_personal_routes(text: str, source: str) -> list[str]:
+    rules = read_rules(text, source)
+    for rule in rules:
+        parts = rule.split(",")
+        if (len(parts) not in (3, 4) or not parts[2].strip()
+                or parts[2] != parts[2].strip()
+                or (len(parts) == 4 and (parts[3] != "no-resolve"
+                    or parts[0] not in ("IP-CIDR", "IP-CIDR6")))):
+            raise ValueError(f"{source}: invalid personal route: {rule}")
+    return rules
+
+
+def build_personal() -> dict[Path, str]:
+    direct_path = ROOT / "Rules/Personal.list"
+    direct = read_rules(direct_path.read_text(encoding="utf-8"), str(direct_path))
+    routes_path = ROOT / "Rules/Personal.routes.list"
+    routes = read_personal_routes(routes_path.read_text(encoding="utf-8"), str(routes_path))
+    rules = routes + [with_policy(rule, "DIRECT") for rule in direct]
+    return {ROOT / "Rules/Personal.clash.yaml": "rules:\n" + "\n".join(
+        "  - " + json.dumps(rule, ensure_ascii=False) for rule in rules
+    ) + "\n"}
+
+
 def build(revision: str | None = None) -> dict[Path, str]:
-    personal_path = ROOT / "Rules/Personal.list"
-    personal = read_rules(personal_path.read_text(encoding="utf-8"), str(personal_path))
+    personal_outputs = build_personal()
     custom_path = ROOT / "Rules/Custom.list"
     custom = read_custom_rules(custom_path.read_text(encoding="utf-8"), str(custom_path))
     revision = revision or json.loads(fetch(ACL_API))["sha"]
@@ -608,9 +630,6 @@ def build(revision: str | None = None) -> dict[Path, str]:
              + "\n".join(surge_rules) + "\n")
     surfboard = surfboard_base.replace("{{PROXY_GROUPS}}", surge_proxy_groups(groups)) + "\n".join(surfboard_rules) + "\n"
     shadow = shadow_base.replace("{{RULES}}", "\n".join(shadow_rules))
-    personal_clash = "payload:\n" + "\n".join(
-        "  - " + json.dumps(rule, ensure_ascii=False) for rule in personal
-    ) + "\n"
     return {
         ROOT / "Upstream/ACL4SSR-REVISION": revision + "\n",
         ROOT / "XBoard/clash.yaml": clash,
@@ -620,19 +639,25 @@ def build(revision: str | None = None) -> dict[Path, str]:
         ROOT / "XBoard/surge.conf": surge,
         ROOT / "XBoard/surfboard.conf": surfboard,
         ROOT / "Shadowrocket/nodnsleak-pk.ini": shadow,
-        ROOT / "Rules/Personal.clash.yaml": personal_clash,
+        **personal_outputs,
     }
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--revision", help="Rebuild a specific ACL4SSR commit instead of updating rules")
+    parser.add_argument("--personal-only", action="store_true", help="Generate personal rule sets without downloading upstream rules")
     args = parser.parse_args()
-    outputs = build(args.revision)  # Validate every download before replacing any output.
+    if args.personal_only and args.revision:
+        parser.error("--personal-only cannot be combined with --revision")
+    outputs = build_personal() if args.personal_only else build(args.revision)
     for path, content in outputs.items():
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(content, encoding="utf-8", newline="\n")
-    print("Generated templates from ACL4SSR revision", outputs[ROOT / "Upstream/ACL4SSR-REVISION"].strip())
+    if args.personal_only:
+        print("Generated personal Clash rule sets")
+    else:
+        print("Generated templates from ACL4SSR revision", outputs[ROOT / "Upstream/ACL4SSR-REVISION"].strip())
 
 
 if __name__ == "__main__":

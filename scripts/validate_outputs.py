@@ -14,7 +14,8 @@ sys.dont_write_bytecode = True
 from build_rules import (APP_DEFAULTS, AUTO_GROUP, BLOCK_GROUPS, DIRECT_GROUP, DISPLAY_FIRST, FINAL_GROUP,
                          MANUAL_GROUP, REGION_GROUPS, REMOVED_GROUP,
                          PROXY_GROUP, SOURCE_AUTO_GROUP, SOURCE_PROXY_GROUP,
-                         read_custom_rules, read_rules, singbox_rule, clash_dns_policies)
+                         read_custom_rules, read_rules, read_personal_routes, with_policy,
+                         singbox_rule, clash_dns_policies)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -30,6 +31,7 @@ custom_path = ROOT / "Rules/Custom.list"
 custom = read_custom_rules(custom_path.read_text(encoding="utf-8"), str(custom_path))
 personal_list = (ROOT / "Rules/Personal.list").read_text(encoding="utf-8")
 personal_rules = read_rules(personal_list, "Rules/Personal.list")
+personal_routes = read_personal_routes((ROOT / "Rules/Personal.routes.list").read_text(encoding="utf-8"), "Rules/Personal.routes.list")
 
 assert isinstance(clash.get("proxy-groups"), list)
 group_names = [group["name"] for group in clash["proxy-groups"]]
@@ -124,9 +126,10 @@ assert any(rule.endswith(f",{block_policy}") for rule in clash["rules"])
 assert clash["rules"].index("DOMAIN-SUFFIX,cn,DIRECT") > next(
     i for i, rule in enumerate(clash["rules"]) if rule.endswith(f",{block_policy}")
 )
-assert isinstance(personal.get("payload"), list)
-assert len(personal["payload"]) == len(set(personal["payload"]))
-assert personal["payload"] == personal_rules
+assert set(personal) == {"rules"}
+assert isinstance(personal["rules"], list)
+assert len(personal["rules"]) == len(set(personal["rules"]))
+assert personal["rules"] == personal_routes + [with_policy(rule, "DIRECT") for rule in personal_rules]
 for rule_set in (clash["rules"], stash["rules"]):
     for rule, _ in custom:
         if not rule.startswith("URL-REGEX,"):
