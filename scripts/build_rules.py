@@ -20,7 +20,7 @@ SOURCE_AUTO_GROUP = "♻️ 自动选择"
 AUTO_GROUP = "♻️ 自动优选"
 MANUAL_GROUP = "🚀 手动选择"
 NO_NODES_PATTERN = "~(?!)~u"
-URL_TEST_INTERVAL = 30 * 60
+URL_TEST_INTERVAL = 10 * 60
 REGION_FLAGS = {
     "🇭🇰 香港地区": "🇭🇰",
     "🇯🇵 日本地区": "🇯🇵",
