@@ -381,7 +381,7 @@ def clash_dns_policies(rules: list[str]) -> tuple[dict, dict]:
         name = f"dns-policy-{index:03d}"
         providers[name] = {"type": "inline", "behavior": "classical", "payload": matchers}
         policies["rule-set:" + name] = (
-            ["https://223.5.5.5/dns-query#DIRECT"] if policy == "DIRECT" else
+            ["https://1.12.12.12/dns-query#DIRECT", "https://120.53.53.53/dns-query#DIRECT"] if policy == "DIRECT" else
             [f"https://1.1.1.1/dns-query#{policy}", f"https://8.8.8.8/dns-query#{policy}"]
         )
     return policies, providers
@@ -433,12 +433,12 @@ def surge_dns_hosts(rules: list[str]) -> list[str]:
         return None
 
     hosts = []
-    seen = {"dns.cloudflare.com", "dns.google", "dns.alidns.com"}
+    seen = {"dns.cloudflare.com", "dns.google", "doh.pub"}
     for kind, value, policy in domain_rules:
         if kind == "DOMAIN-KEYWORD":
             continue
         if policy == "DIRECT":
-            server = "https://223.5.5.5/dns-query"
+            server = "https://1.12.12.12/dns-query"
         elif (policy not in ("REJECT", "🛑 广告拦截", "🍃 应用净化")
               and any(
                   value == suffix or value.endswith("." + suffix)
@@ -623,7 +623,8 @@ def build(revision: str | None = None) -> dict[Path, str]:
         "  - " + json.dumps(rule, ensure_ascii=False) for rule in [
             f"IP-CIDR,1.1.1.1/32,{AUTO_GROUP}",
             f"IP-CIDR,8.8.8.8/32,{AUTO_GROUP}",
-            "IP-CIDR,223.5.5.5/32,DIRECT",
+            "IP-CIDR,1.12.12.12/32,DIRECT",
+            "IP-CIDR,120.53.53.53/32,DIRECT",
         ] + clash_rules) + "\n"
     surge = (surge_base.replace("{{PROXY_GROUPS}}", surge_proxy_groups(groups))
              .replace("{{DNS_HOSTS}}", "\n".join(surge_dns_hosts(surge_rules)))

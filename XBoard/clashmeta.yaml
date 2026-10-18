@@ -19,38 +19,41 @@ dns:
   ipv6: true
   respect-rules: true
   default-nameserver:
-    - https://223.5.5.5/dns-query#DIRECT
+    - https://1.12.12.12/dns-query#DIRECT
+    - https://120.53.53.53/dns-query#DIRECT
   proxy-server-nameserver:
-    - https://223.5.5.5/dns-query#DIRECT
+    - https://1.12.12.12/dns-query#DIRECT
+    - https://120.53.53.53/dns-query#DIRECT
   direct-nameserver:
-    - https://223.5.5.5/dns-query#DIRECT
+    - https://1.12.12.12/dns-query#DIRECT
+    - https://120.53.53.53/dns-query#DIRECT
   direct-nameserver-follow-policy: false
   enhanced-mode: fake-ip
   fake-ip-range: 198.18.0.1/16
   use-hosts: true
   nameserver-policy:
-    "rule-set:dns-policy-000": ["https://223.5.5.5/dns-query#DIRECT"]
+    "rule-set:dns-policy-000": ["https://1.12.12.12/dns-query#DIRECT", "https://120.53.53.53/dns-query#DIRECT"]
     "rule-set:dns-policy-001": ["https://1.1.1.1/dns-query#🛑 广告拦截", "https://8.8.8.8/dns-query#🛑 广告拦截"]
     "rule-set:dns-policy-002": ["https://1.1.1.1/dns-query#🍃 应用净化", "https://8.8.8.8/dns-query#🍃 应用净化"]
-    "rule-set:dns-policy-003": ["https://223.5.5.5/dns-query#DIRECT"]
+    "rule-set:dns-policy-003": ["https://1.12.12.12/dns-query#DIRECT", "https://120.53.53.53/dns-query#DIRECT"]
     "rule-set:dns-policy-004": ["https://1.1.1.1/dns-query#📢 谷歌FCM", "https://8.8.8.8/dns-query#📢 谷歌FCM"]
-    "rule-set:dns-policy-005": ["https://223.5.5.5/dns-query#DIRECT"]
+    "rule-set:dns-policy-005": ["https://1.12.12.12/dns-query#DIRECT", "https://120.53.53.53/dns-query#DIRECT"]
     "rule-set:dns-policy-006": ["https://1.1.1.1/dns-query#Ⓜ️ 微软Bing", "https://8.8.8.8/dns-query#Ⓜ️ 微软Bing"]
     "rule-set:dns-policy-007": ["https://1.1.1.1/dns-query#Ⓜ️ 微软云盘", "https://8.8.8.8/dns-query#Ⓜ️ 微软云盘"]
     "rule-set:dns-policy-008": ["https://1.1.1.1/dns-query#Ⓜ️ 微软服务", "https://8.8.8.8/dns-query#Ⓜ️ 微软服务"]
     "rule-set:dns-policy-009": ["https://1.1.1.1/dns-query#🍎 苹果服务", "https://8.8.8.8/dns-query#🍎 苹果服务"]
     "rule-set:dns-policy-010": ["https://1.1.1.1/dns-query#📲 电报消息", "https://8.8.8.8/dns-query#📲 电报消息"]
     "rule-set:dns-policy-011": ["https://1.1.1.1/dns-query#💬 Ai平台", "https://8.8.8.8/dns-query#💬 Ai平台"]
-    "rule-set:dns-policy-012": ["https://223.5.5.5/dns-query#DIRECT"]
+    "rule-set:dns-policy-012": ["https://1.12.12.12/dns-query#DIRECT", "https://120.53.53.53/dns-query#DIRECT"]
     "rule-set:dns-policy-013": ["https://1.1.1.1/dns-query#🎮 游戏平台", "https://8.8.8.8/dns-query#🎮 游戏平台"]
     "rule-set:dns-policy-014": ["https://1.1.1.1/dns-query#📹 油管视频", "https://8.8.8.8/dns-query#📹 油管视频"]
     "rule-set:dns-policy-015": ["https://1.1.1.1/dns-query#🎥 奈飞视频", "https://8.8.8.8/dns-query#🎥 奈飞视频"]
     "rule-set:dns-policy-016": ["https://1.1.1.1/dns-query#📺 巴哈姆特", "https://8.8.8.8/dns-query#📺 巴哈姆特"]
     "rule-set:dns-policy-017": ["https://1.1.1.1/dns-query#📺 哔哩哔哩", "https://8.8.8.8/dns-query#📺 哔哩哔哩"]
-    "rule-set:dns-policy-018": ["https://223.5.5.5/dns-query#DIRECT"]
+    "rule-set:dns-policy-018": ["https://1.12.12.12/dns-query#DIRECT", "https://120.53.53.53/dns-query#DIRECT"]
     "rule-set:dns-policy-019": ["https://1.1.1.1/dns-query#🌍 国外媒体", "https://8.8.8.8/dns-query#🌍 国外媒体"]
     "rule-set:dns-policy-020": ["https://1.1.1.1/dns-query#🚀 默认代理", "https://8.8.8.8/dns-query#🚀 默认代理"]
-    "rule-set:dns-policy-021": ["https://223.5.5.5/dns-query#DIRECT"]
+    "rule-set:dns-policy-021": ["https://1.12.12.12/dns-query#DIRECT", "https://120.53.53.53/dns-query#DIRECT"]
   nameserver:
     - "https://1.1.1.1/dns-query#🐟 其他流量"
     - "https://8.8.8.8/dns-query#🐟 其他流量"

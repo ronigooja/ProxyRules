@@ -43,7 +43,7 @@ class ClashDNSPolicies(unittest.TestCase):
         rules = ["DOMAIN,alt1-mtalk.google.com,FCM", "DOMAIN-SUFFIX,google.com,DIRECT"]
         self.assertEqual({policy for _, policy in self.resolve_policy(rules, "alt1-mtalk.google.com")}, {"FCM"})
         self.assertEqual(self.resolve_policy(rules, "probe.alt1-mtalk.google.com"),
-                         {("223.5.5.5", "DIRECT")})
+                         {("1.12.12.12", "DIRECT"), ("120.53.53.53", "DIRECT")})
 
     def test_keyword_priority_is_preserved(self):
         rules = ["DOMAIN-KEYWORD,video,Video", "DOMAIN-SUFFIX,example,DIRECT"]

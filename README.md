@@ -72,15 +72,15 @@ Nagi 将远程规则保存为本地快照，并置于订阅规则之前；远端
 nagi rules import personal rules /root/ProxyRules/Rules/Personal.clash.yaml
 ```
 
-Shadowrocket 完整规则配置：`https://raw.githubusercontent.com/ronigooja/ProxyRules/main/Shadowrocket/nodnsleak-pk.ini`。其中不含节点，代理 DNS 使用 Cloudflare／Google IP DoH 并指定 `#proxy`，直连域名及节点地址使用阿里 IP DoH，IPv6 已开启；实际 DNS 行为仍需对应客户端版本验证。
+Shadowrocket 完整规则配置：`https://raw.githubusercontent.com/ronigooja/ProxyRules/main/Shadowrocket/nodnsleak-pk.ini`。其中不含节点，代理 DNS 使用 Cloudflare／Google IP DoH 并指定 `#proxy`，直连域名及节点地址使用腾讯 DNSPod IP DoH，IPv6 已开启；实际 DNS 行为仍需对应客户端版本验证。
 
-DNS 出口要求见 [AGENTS.md](AGENTS.md)：全部使用 IP 形式的 DoH 地址（阿里 `https://223.5.5.5/dns-query`、Cloudflare `https://1.1.1.1/dns-query`、Google `https://8.8.8.8/dns-query`）。代理 DNS 必须跟随业务连接实际使用的节点，直连 DNS 使用阿里并直连。
+DNS 出口要求见 [AGENTS.md](AGENTS.md)：全部使用 IP 形式的 DoH 地址（腾讯 DNSPod `https://1.12.12.12/dns-query`、Cloudflare `https://1.1.1.1/dns-query`、Google `https://8.8.8.8/dns-query`）。代理 DNS 必须跟随业务连接实际使用的节点，直连 DNS 使用腾讯 DNSPod 并直连。
 
-Clash／Clash Meta 现按域名分流规则的原始顺序生成 DNS 策略，Cloudflare／Google 查询绑定对应业务组；固定 DIRECT 域名使用阿里直连。未命中域名规则的查询绑定其他流量组，取消原来统一使用自动优选的 DNS 与备用出口。该配置使用 Mihomo 的 inline classical rule-provider 扩展，旧 Clash 内核不能假定兼容。
+Clash／Clash Meta 现按域名分流规则的原始顺序生成 DNS 策略，Cloudflare／Google 查询绑定对应业务组；固定 DIRECT 域名使用腾讯 DNSPod 直连。未命中域名规则的查询绑定其他流量组，取消原来统一使用自动优选的 DNS 与备用出口。该配置使用 Mihomo 的 inline classical rule-provider 扩展，旧 Clash 内核不能假定兼容。
 
 Sing-box 同样按原始顺序为业务域名选择 DNS 服务器，服务器的 `detour` 绑定对应业务组，包含先于直连后缀的代理例外。代理侧默认查询绑定其他流量组，全局代理模式的 DNS 绑定默认代理组。
 
-**这些修改尚未满足完整的同节点要求。** 官方 Mihomo 1.19.32 实测：新建查询连接可经过应用组选中的节点，但切换节点后可能复用旧节点的 DoH 连接；应用组选 DIRECT 后，普通真实 DNS 查询仍使用 Cloudflare／Google，而非自动切换到阿里。`direct-nameserver` 只处理对应的直连出口解析，不覆盖所有提前发生的 DNS 查询。Sing-box 的静态 DNS 规则也不能按组选 DIRECT 自动改变解析器。按目标 IP、进程等分流时，不能仅根据 DNS 中的域名确定最终业务出口。
+**这些修改尚未满足完整的同节点要求。** 官方 Mihomo 1.19.32 实测：新建查询连接可经过应用组选中的节点，但切换节点后可能复用旧节点的 DoH 连接；应用组选 DIRECT 后，普通真实 DNS 查询仍使用 Cloudflare／Google，而非自动切换到直连解析器（该次实测使用阿里）。`direct-nameserver` 只处理对应的直连出口解析，不覆盖所有提前发生的 DNS 查询。Sing-box 的静态 DNS 规则也不能按组选 DIRECT 自动改变解析器。按目标 IP、进程等分流时，不能仅根据 DNS 中的域名确定最终业务出口。
 
 逐客户端的依据及实测方法见 [DNS 查询出口审计](docs/dns-routing.md)。校验脚本检查规则顺序、业务组绑定及 IP DoH 地址，不把通过结构校验表述为完整运行时出口保证。此前直接阻断所有客户端发布的硬编码检查已撤掉，本次没有调用远端发布 API。
 
@@ -110,3 +110,5 @@ python3 scripts/validate_outputs.py
 只调整分组而保留当前规则版本时，可以使用 `python3 scripts/build_rules.py --revision <Upstream/ACL4SSR-REVISION 中的提交号>`，再运行校验。
 
 校验脚本需要 PyYAML。工作流会安装固定版本。独立规则链接和 XBoard 模板都来自仓库生成文件，部署新工作流后可在 Actions 页面手动运行一次，使站点模板与仓库版本一致。
+
+直连 DNS 使用腾讯 DNSPod IP DoH：`https://1.12.12.12/dns-query`，冗余地址 `https://120.53.53.53/dns-query`。Clash／Clash Meta、Stash、Shadowrocket 和 Surfboard 的相关字段已填写两个地址；其中 Mihomo、Stash、Surfboard 已确认并发查询，Shadowrocket 的直连字段仍待核实，不能视为严格主备。Sing-box 与 Surge 当前仅配置第一个地址，尚未配置自动备用。Surge 新版本支持多个域名专用 DNS；Shadowrocket 直连字段的多地址调度尚未确认，详见 [各客户端多 DNS 地址调查](docs/dns-multiple-resolvers.md)。两个地址属于同一服务商，只提供地址冗余。代理 DNS 的 Cloudflare／Google 地址保持不变。本次上游下载连接失败，已同步修改现有生成文件并完成配置校验；未验证用户网络中的 DNSPod 可达性及自动切换。
