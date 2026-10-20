@@ -50,11 +50,13 @@ assert groups[auto_group]["proxies"] == []
 assert groups[MANUAL_GROUP]["proxies"] == []
 assert set(group_names) >= {"💬 Ai平台", "🎥 奈飞视频", "🇭🇰 香港地区"}
 hong_kong = groups["🇭🇰 香港地区"]["proxies"]
-assert hong_kong[0] == "REJECT"
-assert len(hong_kong) == 2 and hong_kong[1].startswith("~") and hong_kong[1].endswith("~u")
-assert re.search(hong_kong[1][1:-2], "Hong Kong 01")
-assert re.search(hong_kong[1][1:-2], "🇭🇰 01")
-assert not re.search(hong_kong[1][1:-2], "Japan 01")
+assert hong_kong[-1] == "REJECT"
+assert len(hong_kong) == 2 and hong_kong[0].startswith("~") and hong_kong[0].endswith("~u")
+assert re.search(hong_kong[0][1:-2], "Hong Kong 01")
+assert re.search(hong_kong[0][1:-2], "🇭🇰 01")
+assert not re.search(hong_kong[0][1:-2], "Japan 01")
+for name in REGION_GROUPS:
+    assert groups[name]["proxies"][-1] == "REJECT"
 assert REMOVED_GROUP not in groups
 for name, default in APP_DEFAULTS.items():
     assert groups[name]["type"] == "select"
@@ -184,7 +186,7 @@ for name, default in APP_DEFAULTS.items():
     assert "include" not in outbound
 for name in REGION_GROUPS:
     outbound = singbox_outbounds[name]
-    assert outbound["include"] == groups[name]["proxies"][1]
+    assert outbound["include"] == groups[name]["proxies"][0]
     assert outbound["fallback"] == "block"
 for name in (*BLOCK_GROUPS, FINAL_GROUP):
     assert singbox_outbounds[name]["include"] == "~(?!)~u"
@@ -235,6 +237,7 @@ for content in (surge, surfboard):
     for name in REGION_GROUPS:
         line = next(line for line in content.splitlines() if line.startswith(name + " = "))
         assert "include-all-proxies=true" in line and "policy-regex-filter=" in line
+        assert ", REJECT, url=" in line
 for content in (surge, surfboard, shadow):
     for rule, _ in custom:
         if content is surfboard and rule.startswith("URL-REGEX,"):

@@ -278,12 +278,13 @@ def clash_proxy_groups(groups: list[dict]) -> list[dict]:
         if expression is not None:
             # XBoard expands regex entries in proxies against the user's nodes.
             # Its subscription handler does not apply Mihomo's filter field.
-            if not members and expression != "(?:.*)":
+            if expression != "(?:.*)":
+                keep_empty_group = not members
+                members.append(f"~{expression}~u")
                 # Keep the group present without allowing a different region
                 # to win its latency test. REJECT never provides connectivity.
-                members.append("REJECT")
-            if expression != "(?:.*)":
-                members.append(f"~{expression}~u")
+                if keep_empty_group:
+                    members.append("REJECT")
         else:
             # XBoard otherwise appends every subscription node to this group.
             members.append(NO_NODES_PATTERN)
@@ -310,8 +311,8 @@ def surge_proxy_groups(groups: list[dict]) -> str:
             else:
                 # Regex filtering applies to dynamically included proxies,
                 # not to explicitly listed policies.
-                members = ["REJECT", "include-all-proxies=true",
-                           'policy-regex-filter=".*(?:' + expression + ').*"']
+                members = ["include-all-proxies=true",
+                           'policy-regex-filter=".*(?:' + expression + ').*"', "REJECT"]
             members += [f"url={group['items'][1]}",
                        f"interval={group['interval']}", f"tolerance={group['tolerance']}"]
         lines.append(f"{group['name']} = {group['type']}, " + ", ".join(members))
