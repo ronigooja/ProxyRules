@@ -41,10 +41,7 @@ Sing-box 模板沿用 `block` 出站。已查看的 XBoard 上游代码在适配
 
 ## 独立规则链接
 
-[Rules/Personal.clash.yaml](Rules/Personal.clash.yaml) 是供 Nagi 一次导入的完整 Mihomo 规则文件，使用 `rules:` 列表，每条规则自带出口：
-
-- `38.47.101.8/32` → `kunmingguanduqianyunhui8f221-ufi003`
-- `154.19.187.117/32`、`45.45.217.235/32` → `DIRECT`
+[Rules/Personal.clash.yaml](Rules/Personal.clash.yaml) 是供 Nagi 一次导入的完整 Mihomo 规则文件，使用 `rules:` 列表，每条规则自带出口。具体匹配项和出口以规则文件为准。
 
 指定出口规则在 [Rules/Personal.routes.list](Rules/Personal.routes.list) 中维护，格式为 `TYPE,value,节点名或策略组名[,no-resolve]`。原有直连规则在 [Rules/Personal.list](Rules/Personal.list) 中维护，保持不含策略字段，以供 Surge、Shadowrocket 引用并指定 `DIRECT`。生成器先写入指定出口规则，再将直连规则补上 `DIRECT` 合并到同一个 YAML。
 
@@ -58,7 +55,7 @@ Sing-box 模板沿用 `block` 出站。已查看的 XBoard 上游代码在适配
 | Import name | `personal` |
 | Local file path or HTTP(S) URL | `https://raw.githubusercontent.com/ronigooja/ProxyRules/main/Rules/Personal.clash.yaml` |
 
-不需要填写统一 Target；节点 `kunmingguanduqianyunhui8f221-ufi003` 必须存在于当前有效配置。对应 CLI 命令：
+不需要填写统一 Target；规则引用的节点或策略组必须存在于当前有效配置。对应 CLI 命令：
 
 ```sh
 nagi rules import personal rules https://raw.githubusercontent.com/ronigooja/ProxyRules/main/Rules/Personal.clash.yaml
