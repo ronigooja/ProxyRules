@@ -21,6 +21,7 @@ AUTO_GROUP = "♻️ 自动优选"
 MANUAL_GROUP = "🚀 手动选择"
 NO_NODES_PATTERN = "~(?!)~u"
 URL_TEST_INTERVAL = 10 * 60
+URL_TEST_URL = "https://cp.cloudflare.com/generate_204"
 REGION_FLAGS = {
     "🇭🇰 香港地区": "🇭🇰",
     "🇯🇵 日本地区": "🇯🇵",
@@ -191,6 +192,7 @@ def arrange_proxy_groups(groups: list[dict]) -> list[dict]:
             group["items"] = ["[]" + PROXY_GROUP, "[]DIRECT"]
         if group["type"] == "url-test":
             group["interval"] = URL_TEST_INTERVAL
+            group["items"][1] = URL_TEST_URL
         result.append(group)
     return result
 

@@ -10841,7 +10841,7 @@
       "type": "urltest",
       "tag": "♻️ 自动优选",
       "outbounds": [],
-      "url": "http://www.gstatic.com/generate_204",
+      "url": "https://cp.cloudflare.com/generate_204",
       "interval": "600s",
       "tolerance": 50
     },
@@ -10856,7 +10856,7 @@
       "outbounds": [],
       "include": "~(?:(港|HK|hk|Hong Kong|HongKong|hongkong))|(?:🇭🇰)~u",
       "fallback": "block",
-      "url": "http://www.gstatic.com/generate_204",
+      "url": "https://cp.cloudflare.com/generate_204",
       "interval": "600s",
       "tolerance": 50
     },
@@ -10866,7 +10866,7 @@
       "outbounds": [],
       "include": "~(?:(台|新北|彰化|TW|Taiwan))~u",
       "fallback": "block",
-      "url": "http://www.gstatic.com/generate_204",
+      "url": "https://cp.cloudflare.com/generate_204",
       "interval": "600s",
       "tolerance": 50
     },
@@ -10876,7 +10876,7 @@
       "outbounds": [],
       "include": "~(?:(新加坡|坡|狮城|SG|Singapore))|(?:🇸🇬)~u",
       "fallback": "block",
-      "url": "http://www.gstatic.com/generate_204",
+      "url": "https://cp.cloudflare.com/generate_204",
       "interval": "600s",
       "tolerance": 50
     },
@@ -10886,7 +10886,7 @@
       "outbounds": [],
       "include": "~(?:(日本|川日|东京|大阪|泉日|埼玉|沪日|深日|JP|Japan))|(?:🇯🇵)~u",
       "fallback": "block",
-      "url": "http://www.gstatic.com/generate_204",
+      "url": "https://cp.cloudflare.com/generate_204",
       "interval": "600s",
       "tolerance": 50
     },
@@ -10896,7 +10896,7 @@
       "outbounds": [],
       "include": "~(?:(美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|US|United States))|(?:🇺🇸|🇺🇲)~u",
       "fallback": "block",
-      "url": "http://www.gstatic.com/generate_204",
+      "url": "https://cp.cloudflare.com/generate_204",
       "interval": "600s",
       "tolerance": 150
     },
@@ -10906,7 +10906,7 @@
       "outbounds": [],
       "include": "~(?:(KR|Korea|KOR|首尔|韩|韓))|(?:🇰🇷)~u",
       "fallback": "block",
-      "url": "http://www.gstatic.com/generate_204",
+      "url": "https://cp.cloudflare.com/generate_204",
       "interval": "600s",
       "tolerance": 50
     },

@@ -62,14 +62,14 @@ proxies:
 
 proxy-groups:
   - {"name": "🚀 默认代理", "type": "select", "proxies": ["♻️ 自动优选", "🚀 手动选择", "🇭🇰 香港地区", "🇨🇳 台湾地区", "🇸🇬 新加坡地区", "🇯🇵 日本地区", "🇺🇸 美国地区", "🇰🇷 韩国地区", "DIRECT", "~(?!)~u"]}
-  - {"name": "♻️ 自动优选", "type": "url-test", "proxies": [], "url": "http://www.gstatic.com/generate_204", "interval": 600, "tolerance": 50}
+  - {"name": "♻️ 自动优选", "type": "url-test", "proxies": [], "url": "https://cp.cloudflare.com/generate_204", "interval": 600, "tolerance": 50}
   - {"name": "🚀 手动选择", "type": "select", "proxies": []}
-  - {"name": "🇭🇰 香港地区", "type": "url-test", "proxies": ["~(?:(港|HK|hk|Hong Kong|HongKong|hongkong))|(?:🇭🇰)~u", "REJECT"], "url": "http://www.gstatic.com/generate_204", "interval": 600, "tolerance": 50}
-  - {"name": "🇨🇳 台湾地区", "type": "url-test", "proxies": ["~(?:(台|新北|彰化|TW|Taiwan))~u", "REJECT"], "url": "http://www.gstatic.com/generate_204", "interval": 600, "tolerance": 50}
-  - {"name": "🇸🇬 新加坡地区", "type": "url-test", "proxies": ["~(?:(新加坡|坡|狮城|SG|Singapore))|(?:🇸🇬)~u", "REJECT"], "url": "http://www.gstatic.com/generate_204", "interval": 600, "tolerance": 50}
-  - {"name": "🇯🇵 日本地区", "type": "url-test", "proxies": ["~(?:(日本|川日|东京|大阪|泉日|埼玉|沪日|深日|JP|Japan))|(?:🇯🇵)~u", "REJECT"], "url": "http://www.gstatic.com/generate_204", "interval": 600, "tolerance": 50}
-  - {"name": "🇺🇸 美国地区", "type": "url-test", "proxies": ["~(?:(美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|US|United States))|(?:🇺🇸|🇺🇲)~u", "REJECT"], "url": "http://www.gstatic.com/generate_204", "interval": 600, "tolerance": 150}
-  - {"name": "🇰🇷 韩国地区", "type": "url-test", "proxies": ["~(?:(KR|Korea|KOR|首尔|韩|韓))|(?:🇰🇷)~u", "REJECT"], "url": "http://www.gstatic.com/generate_204", "interval": 600, "tolerance": 50}
+  - {"name": "🇭🇰 香港地区", "type": "url-test", "proxies": ["~(?:(港|HK|hk|Hong Kong|HongKong|hongkong))|(?:🇭🇰)~u", "REJECT"], "url": "https://cp.cloudflare.com/generate_204", "interval": 600, "tolerance": 50}
+  - {"name": "🇨🇳 台湾地区", "type": "url-test", "proxies": ["~(?:(台|新北|彰化|TW|Taiwan))~u", "REJECT"], "url": "https://cp.cloudflare.com/generate_204", "interval": 600, "tolerance": 50}
+  - {"name": "🇸🇬 新加坡地区", "type": "url-test", "proxies": ["~(?:(新加坡|坡|狮城|SG|Singapore))|(?:🇸🇬)~u", "REJECT"], "url": "https://cp.cloudflare.com/generate_204", "interval": 600, "tolerance": 50}
+  - {"name": "🇯🇵 日本地区", "type": "url-test", "proxies": ["~(?:(日本|川日|东京|大阪|泉日|埼玉|沪日|深日|JP|Japan))|(?:🇯🇵)~u", "REJECT"], "url": "https://cp.cloudflare.com/generate_204", "interval": 600, "tolerance": 50}
+  - {"name": "🇺🇸 美国地区", "type": "url-test", "proxies": ["~(?:(美|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|US|United States))|(?:🇺🇸|🇺🇲)~u", "REJECT"], "url": "https://cp.cloudflare.com/generate_204", "interval": 600, "tolerance": 150}
+  - {"name": "🇰🇷 韩国地区", "type": "url-test", "proxies": ["~(?:(KR|Korea|KOR|首尔|韩|韓))|(?:🇰🇷)~u", "REJECT"], "url": "https://cp.cloudflare.com/generate_204", "interval": 600, "tolerance": 50}
   - {"name": "📲 电报消息", "type": "select", "proxies": ["🚀 默认代理", "🇭🇰 香港地区", "🇨🇳 台湾地区", "🇸🇬 新加坡地区", "🇯🇵 日本地区", "🇺🇸 美国地区", "🇰🇷 韩国地区", "DIRECT"]}
   - {"name": "💬 Ai平台", "type": "select", "proxies": ["🇸🇬 新加坡地区", "🚀 默认代理", "🇭🇰 香港地区", "🇨🇳 台湾地区", "🇯🇵 日本地区", "🇺🇸 美国地区", "🇰🇷 韩国地区", "DIRECT"]}
   - {"name": "📹 油管视频", "type": "select", "proxies": ["🇺🇸 美国地区", "🚀 默认代理", "🇭🇰 香港地区", "🇨🇳 台湾地区", "🇸🇬 新加坡地区", "🇯🇵 日本地区", "🇰🇷 韩国地区", "DIRECT"]}
