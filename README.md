@@ -14,7 +14,7 @@ ACL4SSR 的 `Online Full` 提供规则和地区节点匹配条件；本仓库的
 | 国家／地区组（香港地区、台湾地区、新加坡地区、日本地区、美国地区、韩国地区） | 按节点名称和地区旗帜筛选，按延迟自动选择 | 对应地区节点 |
 | 各应用分流组 | 默认代理、六个地区组、DIRECT、全部具体节点（初始选择置顶） | 按应用用途设置 |
 | 广告拦截／应用净化 | REJECT、DIRECT | REJECT |
-| 🐟 其他流量 | 默认代理、DIRECT | 默认代理 |
+| 🐟 其他流量 | 默认代理、六个地区组、DIRECT、全部具体节点 | 默认代理 |
 
 自动优选和六个国家／地区组的测速间隔固定为 600 秒（10 分钟），由本仓库生成脚本统一设置，不随上游间隔变化。实际测速时机受客户端运行状态和按需测速行为影响。
 
@@ -33,7 +33,7 @@ ACL4SSR 的 `Online Full` 提供规则和地区节点匹配条件；本仓库的
 
 “奈飞节点”已并入“奈飞视频”，取消奈飞和网易音乐的解锁名称筛选。地区组只按节点名称筛选，不保证真实地理位置或服务解锁能力。无匹配节点时地区组拒绝连接，用户可在应用组改选其他地区或具体节点；不会自动使用其他地区的节点。
 
-Clash、Clash Meta、Stash 使用 XBoard 可识别的正则节点占位；默认代理、拦截组和其他流量组使用不匹配节点的占位，阻止 XBoard 追加全部节点。地区组保留 REJECT，以免无匹配时被 XBoard 删除并留下无效引用。Surge、Surfboard 使用 `include-all-proxies` 和 `policy-regex-filter` 筛选地区节点，REJECT 仅作为不可连接的占位。Sing-box 使用 XBoard 的 `include` 条件和 `fallback=block`，筛选字段由 XBoard 在生成订阅时移除。
+Clash、Clash Meta、Stash 使用 XBoard 可识别的正则节点占位；默认代理和拦截组使用不匹配节点的占位，阻止 XBoard 追加全部节点。其他流量组与应用组一样允许追加全部具体节点，初始选择为默认代理。地区组保留 REJECT，以免无匹配时被 XBoard 删除并留下无效引用。Surge、Surfboard 使用 `include-all-proxies` 和 `policy-regex-filter` 筛选地区节点，REJECT 仅作为不可连接的占位。Sing-box 使用 XBoard 的 `include` 条件和 `fallback=block`，筛选字段由 XBoard 在生成订阅时移除。
 
 规则从上往下首次命中生效，先决定进入哪个组，再使用该组当前选择。应用组选择“默认代理”时跟随该组当前选择；选择地区或具体节点时独立生效。明确的 DIRECT／REJECT 规则直接执行对应动作。上游规则顺序保持不变，分组映射与默认值集中在 `scripts/build_rules.py`；上游新增或删除分组时生成器会提示更新映射。
 

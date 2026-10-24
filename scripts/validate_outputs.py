@@ -64,8 +64,9 @@ for name, default in APP_DEFAULTS.items():
     assert set(groups[name]["proxies"]) == {PROXY_GROUP, *REGION_GROUPS, "DIRECT"}
 assert group_names[len(DISPLAY_FIRST):-3] == list(APP_DEFAULTS)
 assert group_names[-3:-1] == list(BLOCK_GROUPS)
-for name in (*BLOCK_GROUPS, FINAL_GROUP):
+for name in BLOCK_GROUPS:
     assert groups[name]["proxies"][-1] == "~(?!)~u"
+assert groups[FINAL_GROUP]["proxies"] == [PROXY_GROUP, *REGION_GROUPS, "DIRECT"]
 for group in groups.values():
     assert all(member in groups or member in {"DIRECT", "REJECT"} or member.startswith("~") for member in group["proxies"])
 
@@ -79,8 +80,9 @@ for name, group in groups.items():
     nodes = [node for node in sample_nodes if not filters or any(
         re.search(pattern[1:-2], node) for pattern in filters)]
     expanded[name] = refs + nodes
-for name in (PROXY_GROUP, *BLOCK_GROUPS, FINAL_GROUP):
+for name in (PROXY_GROUP, *BLOCK_GROUPS):
     assert not set(expanded[name]) & set(sample_nodes)
+assert set(sample_nodes) <= set(expanded[FINAL_GROUP])
 for name, default in APP_DEFAULTS.items():
     assert expanded[name][0] == default
     assert set(sample_nodes) <= set(expanded[name])
@@ -188,8 +190,10 @@ for name in REGION_GROUPS:
     outbound = singbox_outbounds[name]
     assert outbound["include"] == groups[name]["proxies"][0]
     assert outbound["fallback"] == "block"
-for name in (*BLOCK_GROUPS, FINAL_GROUP):
+for name in BLOCK_GROUPS:
     assert singbox_outbounds[name]["include"] == "~(?!)~u"
+assert "include" not in singbox_outbounds[FINAL_GROUP]
+assert singbox_outbounds[FINAL_GROUP]["outbounds"] == [PROXY_GROUP, *REGION_GROUPS, "direct"]
 for rule, policy in custom:
     converted = singbox_rule(rule, policy)
     if converted is not None:

@@ -189,7 +189,15 @@ def arrange_proxy_groups(groups: list[dict]) -> list[dict]:
         elif name in BLOCK_GROUPS:
             group["items"] = ["[]REJECT", "[]DIRECT"]
         elif name == FINAL_GROUP:
-            group["items"] = ["[]" + PROXY_GROUP, "[]DIRECT"]
+            # Keep the catch-all group selectable like application groups:
+            # users can choose a region or a concrete subscription node
+            # instead of being limited to the nested default proxy group.
+            group["items"] = [
+                "[]" + PROXY_GROUP,
+                *["[]" + region for region in REGION_GROUPS],
+                "[]DIRECT",
+                ".*",
+            ]
         if group["type"] == "url-test":
             group["interval"] = URL_TEST_INTERVAL
             group["items"][1] = URL_TEST_URL
