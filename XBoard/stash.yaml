@@ -170,6 +170,7 @@ rules:
   - "DOMAIN,api.github.com,美国 HH01LA"
   - "DOMAIN-SUFFIX,githubusercontent.com,美国 HH01LA"
   - "DOMAIN-SUFFIX,blob.core.windows.net,美国 HH01LA"
+  - "DOMAIN,ai.nodemgr.uk,DIRECT"
   - "DOMAIN-SUFFIX,ol.epicgames.com,DIRECT"
   - "DOMAIN-SUFFIX,dizhensubao.getui.com,DIRECT"
   - "DOMAIN,dl.google.com,DIRECT"

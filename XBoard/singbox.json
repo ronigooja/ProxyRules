@@ -222,6 +222,12 @@
         "server": "dns-outbound-028"
       },
       {
+        "domain": [
+          "ai.nodemgr.uk"
+        ],
+        "server": "local"
+      },
+      {
         "domain_suffix": [
           "ol.epicgames.com",
           "dizhensubao.getui.com"
@@ -11291,6 +11297,12 @@
           "blob.core.windows.net"
         ],
         "outbound": "美国 HH01LA"
+      },
+      {
+        "domain": [
+          "ai.nodemgr.uk"
+        ],
+        "outbound": "direct"
       },
       {
         "domain_suffix": [
