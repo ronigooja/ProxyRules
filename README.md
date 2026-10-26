@@ -43,9 +43,9 @@ Sing-box 模板沿用 `block` 出站。已查看的 XBoard 上游代码在适配
 
 [Rules/Personal.clash.yaml](Rules/Personal.clash.yaml) 是供 Nagi 一次导入的完整 Mihomo 规则文件，使用 `rules:` 列表，每条规则自带出口。具体匹配项和出口以规则文件为准。
 
-指定出口规则在 [Rules/Personal.routes.list](Rules/Personal.routes.list) 中维护，格式为 `TYPE,value,节点名或策略组名[,no-resolve]`。原有直连规则在 [Rules/Personal.list](Rules/Personal.list) 中维护，保持不含策略字段，以供 Surge、Shadowrocket 引用并指定 `DIRECT`。生成器先写入指定出口规则，再将直连规则补上 `DIRECT` 合并到同一个 YAML。
+Maintain all personal rules in [Rules/Personal.list](Rules/Personal.list), using `TYPE,value,node-or-policy-group[,no-resolve]`. Every rule includes its outbound: use `DIRECT` for direct connections or a node/policy group name for a specific route. Named outbounds must exist in both Nagi and Shadowrocket; generation does not create nodes or policy groups.
 
-修改源文件后执行 `python3 scripts/build_rules.py --personal-only` 即可生成，不下载上游规则。完整生成及月度工作流也会更新此文件。XBoard 模板只合并 `Rules/Custom.list`；Shadowrocket 配置只包含个人直连规则链接 `https://raw.githubusercontent.com/ronigooja/ProxyRules/main/Rules/Personal.list`。
+Run `python3 scripts/build_rules.py --personal-only` after editing the source. This updates `Rules/Personal.clash.yaml` and the marked personal rules block in `Shadowrocket/nodnsleak-pk.ini` without downloading upstream rules. Full generation and the monthly workflow update both outputs as well. Shadowrocket embeds each personal rule with its own outbound after local network rules and before custom rules; it no longer loads the source as a remote rule set with a fixed `DIRECT` policy. Update the configuration in Shadowrocket to apply regenerated rules. XBoard templates continue to merge only `Rules/Custom.list`.
 
 在 Nagi 的 **Rules → Import**（终端菜单显示为 **Settings & Maintenance → Routing Rules → Import rule file**）中填写：
 
@@ -109,3 +109,9 @@ python3 scripts/validate_outputs.py
 校验脚本需要 PyYAML。工作流会安装固定版本。独立规则链接和 XBoard 模板都来自仓库生成文件，部署新工作流后可在 Actions 页面手动运行一次，使站点模板与仓库版本一致。
 
 直连 DNS 使用腾讯 DNSPod IP DoH：`https://1.12.12.12/dns-query`，冗余地址 `https://120.53.53.53/dns-query`。Clash／Clash Meta、Stash、Shadowrocket 和 Surfboard 的相关字段已填写两个地址；其中 Mihomo、Stash、Surfboard 已确认并发查询，Shadowrocket 的直连字段仍待核实，不能视为严格主备。Sing-box 与 Surge 当前仅配置第一个地址，尚未配置自动备用。Surge 新版本支持多个域名专用 DNS；Shadowrocket 直连字段的多地址调度尚未确认，详见 [各客户端多 DNS 地址调查](docs/dns-multiple-resolvers.md)。两个地址属于同一服务商，只提供地址冗余。代理 DNS 的 Cloudflare／Google 地址保持不变。本次上游下载连接失败，已同步修改现有生成文件并完成配置校验；未验证用户网络中的 DNSPod 可达性及自动切换。
+
+### Rule priority
+
+Rules use the first matching entry. Generation places local network rules first, followed by personal rules (Shadowrocket only), custom rules, the upstream direct whitelist (`UnBan.list`), advertisement blocking (`BanAD.list`), application filtering (`BanProgramAD.list`), remaining upstream categories in their original order, and the final fallback. Personal rules therefore override custom rules in Shadowrocket, and both override the upstream whitelist and filtering. XBoard templates exclude personal rules. Nagi imports `Personal.clash.yaml` separately; its client controls where imported rules appear.
+
+Existing client-specific DNS endpoint routes are separate from this ordering. Shadowrocket still uses its fixed DNS endpoint routes; this priority change does not implement DNS routing through each business rule's selected node.

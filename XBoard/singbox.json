@@ -114,6 +114,12 @@
         "type": "https",
         "server": "1.1.1.1",
         "detour": "🍃 应用净化"
+      },
+      {
+        "tag": "dns-outbound-028",
+        "type": "https",
+        "server": "1.1.1.1",
+        "detour": "美国 HH01LA"
       }
     ],
     "rules": [
@@ -161,6 +167,62 @@
           "zte.home",
           "tplogin.cn",
           "wifi.cmcc",
+          "deepseek.com",
+          "moonshot.cn",
+          "kimi.moonshot.cn",
+          "zhipuai.cn",
+          "chatglm.cn",
+          "bigmodel.cn",
+          "dashscope.aliyuncs.com",
+          "aliyuncs.com",
+          "qianwen.com",
+          "qianwenai.com",
+          "doubao.com",
+          "volcengine.com",
+          "volces.com",
+          "yiyan.baidu.com",
+          "ernie.baidu.com",
+          "baidu.com",
+          "hunyuan.tencent.com",
+          "tencentcloudapi.com",
+          "tencent.com",
+          "xfyun.cn",
+          "iflytek.com",
+          "minimaxi.com",
+          "hailuoai.com",
+          "baichuan-ai.com",
+          "baichuan-inc.com",
+          "stepfun.com",
+          "stepai.cn",
+          "sensetime.com",
+          "sensecore.cn",
+          "huaweicloud.com",
+          "mindspore.cn",
+          "360.cn",
+          "so.com",
+          "jd.com",
+          "youdao.com",
+          "volcengineapi.com",
+          "tencentcloud.com"
+        ],
+        "server": "local"
+      },
+      {
+        "domain": [
+          "github.com",
+          "api.github.com"
+        ],
+        "server": "dns-outbound-028"
+      },
+      {
+        "domain_suffix": [
+          "githubusercontent.com",
+          "blob.core.windows.net"
+        ],
+        "server": "dns-outbound-028"
+      },
+      {
+        "domain_suffix": [
           "ol.epicgames.com",
           "dizhensubao.getui.com"
         ],
@@ -1829,48 +1891,6 @@
           "up.qingdaonews.com"
         ],
         "server": "dns-outbound-023"
-      },
-      {
-        "domain_suffix": [
-          "deepseek.com",
-          "moonshot.cn",
-          "kimi.moonshot.cn",
-          "zhipuai.cn",
-          "chatglm.cn",
-          "bigmodel.cn",
-          "dashscope.aliyuncs.com",
-          "aliyuncs.com",
-          "qianwen.com",
-          "qianwenai.com",
-          "doubao.com",
-          "volcengine.com",
-          "volces.com",
-          "yiyan.baidu.com",
-          "ernie.baidu.com",
-          "baidu.com",
-          "hunyuan.tencent.com",
-          "tencentcloudapi.com",
-          "tencent.com",
-          "xfyun.cn",
-          "iflytek.com",
-          "minimaxi.com",
-          "hailuoai.com",
-          "baichuan-ai.com",
-          "baichuan-inc.com",
-          "stepfun.com",
-          "stepai.cn",
-          "sensetime.com",
-          "sensecore.cn",
-          "huaweicloud.com",
-          "mindspore.cn",
-          "360.cn",
-          "so.com",
-          "jd.com",
-          "youdao.com",
-          "volcengineapi.com",
-          "tencentcloud.com"
-        ],
-        "server": "local"
       },
       {
         "domain": [
@@ -11218,6 +11238,62 @@
           "zte.home",
           "tplogin.cn",
           "wifi.cmcc",
+          "deepseek.com",
+          "moonshot.cn",
+          "kimi.moonshot.cn",
+          "zhipuai.cn",
+          "chatglm.cn",
+          "bigmodel.cn",
+          "dashscope.aliyuncs.com",
+          "aliyuncs.com",
+          "qianwen.com",
+          "qianwenai.com",
+          "doubao.com",
+          "volcengine.com",
+          "volces.com",
+          "yiyan.baidu.com",
+          "ernie.baidu.com",
+          "baidu.com",
+          "hunyuan.tencent.com",
+          "tencentcloudapi.com",
+          "tencent.com",
+          "xfyun.cn",
+          "iflytek.com",
+          "minimaxi.com",
+          "hailuoai.com",
+          "baichuan-ai.com",
+          "baichuan-inc.com",
+          "stepfun.com",
+          "stepai.cn",
+          "sensetime.com",
+          "sensecore.cn",
+          "huaweicloud.com",
+          "mindspore.cn",
+          "360.cn",
+          "so.com",
+          "jd.com",
+          "youdao.com",
+          "volcengineapi.com",
+          "tencentcloud.com"
+        ],
+        "outbound": "direct"
+      },
+      {
+        "domain": [
+          "github.com",
+          "api.github.com"
+        ],
+        "outbound": "美国 HH01LA"
+      },
+      {
+        "domain_suffix": [
+          "githubusercontent.com",
+          "blob.core.windows.net"
+        ],
+        "outbound": "美国 HH01LA"
+      },
+      {
+        "domain_suffix": [
           "ol.epicgames.com",
           "dizhensubao.getui.com"
         ],
@@ -12925,48 +13001,6 @@
           "up.qingdaonews.com"
         ],
         "outbound": "🍃 应用净化"
-      },
-      {
-        "domain_suffix": [
-          "deepseek.com",
-          "moonshot.cn",
-          "kimi.moonshot.cn",
-          "zhipuai.cn",
-          "chatglm.cn",
-          "bigmodel.cn",
-          "dashscope.aliyuncs.com",
-          "aliyuncs.com",
-          "qianwen.com",
-          "qianwenai.com",
-          "doubao.com",
-          "volcengine.com",
-          "volces.com",
-          "yiyan.baidu.com",
-          "ernie.baidu.com",
-          "baidu.com",
-          "hunyuan.tencent.com",
-          "tencentcloudapi.com",
-          "tencent.com",
-          "xfyun.cn",
-          "iflytek.com",
-          "minimaxi.com",
-          "hailuoai.com",
-          "baichuan-ai.com",
-          "baichuan-inc.com",
-          "stepfun.com",
-          "stepai.cn",
-          "sensetime.com",
-          "sensecore.cn",
-          "huaweicloud.com",
-          "mindspore.cn",
-          "360.cn",
-          "so.com",
-          "jd.com",
-          "youdao.com",
-          "volcengineapi.com",
-          "tencentcloud.com"
-        ],
-        "outbound": "direct"
       },
       {
         "domain": [

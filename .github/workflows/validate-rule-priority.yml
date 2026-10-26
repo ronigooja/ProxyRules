@@ -1,0 +1,19 @@
+name: Validate personal and custom rule priority
+on:
+  push:
+    branches: ['codex/rule-priority-*']
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 -m pip install 'PyYAML==6.0.2'
+      - name: Regenerate pinned configuration and validate
+        run: |
+          python3 scripts/build_rules.py --revision "$(cat Upstream/ACL4SSR-REVISION)"
+          python3 scripts/validate_outputs.py
+          python3 scripts/test_dns_policies.py
+          python3 scripts/build_rules.py --personal-only
+          git diff --exit-code

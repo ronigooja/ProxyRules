@@ -1,7 +1,1 @@
-rules:
-  - "IP-CIDR,45.45.217.235/32,昆明qyh8f221,no-resolve"
-  - "IP-CIDR,154.19.187.117/32,昆明qyh8f221,no-resolve"
-  - "IP-CIDR,38.47.101.8/32,昆明qyh8f221,no-resolve"
-  - "IP-CIDR,50.114.114.252/32,昆明qyh8f221,no-resolve"
-  - "IP-CIDR,70.39.178.189/32,昆明qyh8f221,no-resolve"
-  - "IP-CIDR,64.118.131.42/32,昆明qyh8f221,no-resolve"
+rules: []
