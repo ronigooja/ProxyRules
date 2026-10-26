@@ -15,7 +15,7 @@ from build_rules import (APP_DEFAULTS, AUTO_GROUP, BLOCK_GROUPS, DIRECT_GROUP, D
                          MANUAL_GROUP, REGION_GROUPS, REMOVED_GROUP,
                          PROXY_GROUP, SOURCE_AUTO_GROUP, SOURCE_PROXY_GROUP,
                          read_custom_rules, read_rules, read_personal_routes, with_policy,
-                         singbox_rule, clash_dns_policies)
+                         singbox_rule, clash_dns_policies, PERSONAL_BEGIN, PERSONAL_END)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -30,8 +30,7 @@ shadow = (ROOT / "Shadowrocket/nodnsleak-pk.ini").read_text(encoding="utf-8")
 custom_path = ROOT / "Rules/Custom.list"
 custom = read_custom_rules(custom_path.read_text(encoding="utf-8"), str(custom_path))
 personal_list = (ROOT / "Rules/Personal.list").read_text(encoding="utf-8")
-personal_rules = read_rules(personal_list, "Rules/Personal.list", allow_empty=True)
-personal_routes = read_personal_routes((ROOT / "Rules/Personal.routes.list").read_text(encoding="utf-8"), "Rules/Personal.routes.list")
+personal_rules = read_personal_routes(personal_list, "Rules/Personal.list")
 
 assert isinstance(clash.get("proxy-groups"), list)
 group_names = [group["name"] for group in clash["proxy-groups"]]
@@ -135,12 +134,13 @@ assert clash["rules"].index("DOMAIN-SUFFIX,cn,DIRECT") > next(
 assert set(personal) == {"rules"}
 assert isinstance(personal["rules"], list)
 assert len(personal["rules"]) == len(set(personal["rules"]))
-assert personal["rules"] == personal_routes + [with_policy(rule, "DIRECT") for rule in personal_rules]
+assert personal["rules"] == personal_rules
 for rule_set in (clash["rules"], stash["rules"]):
     for rule, _ in custom:
         if not rule.startswith("URL-REGEX,"):
             rendered = rule.replace(",Proxy", f",{PROXY_GROUP}")
-            assert rule_set.index(f"DOMAIN-SUFFIX,a.youdao.com,{app_policy}") < rule_set.index(rendered) < rule_set.index("DOMAIN-SUFFIX,cn,DIRECT")
+            assert rule_set.index("DOMAIN-SUFFIX,wifi.cmcc,DIRECT") < rule_set.index(rendered) < rule_set.index("DOMAIN-SUFFIX,ol.epicgames.com,DIRECT")
+            assert rule_set.index(rendered) < rule_set.index(f"DOMAIN-SUFFIX,a.youdao.com,{app_policy}")
 route = singbox["route"]
 assert route["final"] == FINAL_GROUP
 assert route["default_domain_resolver"]["server"] == "local"
@@ -198,6 +198,8 @@ for rule, policy in custom:
     converted = singbox_rule(rule, policy)
     if converted is not None:
         assert converted in flat_rules
+        assert flat_rules.index({"domain_suffix": ["wifi.cmcc"], "outbound": "direct"}) < flat_rules.index(converted)
+        assert flat_rules.index(converted) < flat_rules.index({"domain_suffix": ["ol.epicgames.com"], "outbound": "direct"})
 assert "[Proxy]" in surge and "[Rule]" in surge
 assert surge.rstrip().endswith(f"FINAL,{FINAL_GROUP}")
 assert "encrypted-dns-server = https://1.1.1.1/dns-query, https://8.8.8.8/dns-query" in surge
@@ -248,7 +250,8 @@ for content in (surge, surfboard, shadow):
             continue
         rendered = rule.replace(",Proxy", ",PROXY" if content is shadow else f",{PROXY_GROUP}")
         reject = "REJECT" if content is shadow else app_policy
-        assert content.index(f"DOMAIN-SUFFIX,a.youdao.com,{reject}") < content.index(rendered) < content.index("DOMAIN-SUFFIX,cn,DIRECT")
+        assert content.index("DOMAIN-SUFFIX,wifi.cmcc,DIRECT") < content.index(rendered) < content.index("DOMAIN-SUFFIX,ol.epicgames.com,DIRECT")
+        assert content.index(rendered) < content.index(f"DOMAIN-SUFFIX,a.youdao.com,{reject}")
 assert "[Rule]" in shadow and "[Host]" in shadow
 assert "dns-server = https://1.1.1.1/dns-query#proxy, https://8.8.8.8/dns-query#proxy" in shadow
 assert "direct-dns-server = https://1.12.12.12/dns-query, https://120.53.53.53/dns-query" in shadow
@@ -258,7 +261,14 @@ assert "dns-direct-fallback-proxy = false" in shadow
 for content in (clash, clashmeta, stash, singbox, surge, surfboard):
     rendered = content if isinstance(content, str) else json.dumps(content, ensure_ascii=False)
     assert SOURCE_PROXY_GROUP not in rendered and SOURCE_AUTO_GROUP not in rendered
-assert "RULE-SET,https://raw.githubusercontent.com/ronigooja/ProxyRules/main/Rules/Personal.list,DIRECT" in shadow
+assert shadow.count(PERSONAL_BEGIN) == shadow.count(PERSONAL_END) == 1
+shadow_personal = shadow.split(PERSONAL_BEGIN, 1)[1].split(PERSONAL_END, 1)[0]
+assert shadow_personal.strip().splitlines() == personal_rules
+assert "RULE-SET,https://raw.githubusercontent.com/ronigooja/ProxyRules/main/Rules/Personal.list" not in shadow
+assert shadow.index("DOMAIN-SUFFIX,wifi.cmcc,DIRECT") < shadow.index(PERSONAL_BEGIN)
+assert shadow.index(PERSONAL_END) < shadow.index("DOMAIN-SUFFIX,ol.epicgames.com,DIRECT")
+for rule, _ in custom:
+    assert shadow.index(PERSONAL_END) < shadow.index(rule.replace(",Proxy", ",PROXY"))
 assert shadow.index("FINAL,PROXY") < shadow.index("[Host]")
 
 # DNS endpoints must be HTTPS with literal IP hosts; URL fragments select

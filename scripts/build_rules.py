@@ -97,7 +97,8 @@ def read_custom_rules(text: str, source: str) -> list[tuple[str, str]]:
             continue
         parts = rule.split(",")
         if (parts[0] not in RULE_TYPES or len(parts) not in (3, 4)
-                or not parts[1].strip() or parts[2] not in ("DIRECT", "REJECT", "Proxy")
+                or not parts[1].strip() or not parts[2].strip()
+                or parts[2] != parts[2].strip()
                 or (len(parts) == 4 and (parts[3] != "no-resolve" or parts[0] not in ("IP-CIDR", "IP-CIDR6")))):
             raise ValueError(f"{source}:{number}: invalid custom rule: {rule}")
         rules.append((rule, parts[2]))
@@ -472,7 +473,7 @@ def surge_dns_hosts(rules: list[str]) -> list[str]:
 
 
 def read_personal_routes(text: str, source: str) -> list[str]:
-    rules = read_rules(text, source)
+    rules = read_rules(text, source, allow_empty=True)
     for rule in rules:
         parts = rule.split(",")
         if (len(parts) not in (3, 4) or not parts[2].strip()
@@ -483,15 +484,33 @@ def read_personal_routes(text: str, source: str) -> list[str]:
     return rules
 
 
-def build_personal() -> dict[Path, str]:
-    direct_path = ROOT / "Rules/Personal.list"
-    direct = read_rules(direct_path.read_text(encoding="utf-8"), str(direct_path), allow_empty=True)
-    routes_path = ROOT / "Rules/Personal.routes.list"
-    routes = read_personal_routes(routes_path.read_text(encoding="utf-8"), str(routes_path))
-    rules = routes + [with_policy(rule, "DIRECT") for rule in direct]
-    return {ROOT / "Rules/Personal.clash.yaml": "rules:\n" + "\n".join(
-        "  - " + json.dumps(rule, ensure_ascii=False) for rule in rules
-    ) + "\n"}
+PERSONAL_BEGIN = "# BEGIN Personal rules"
+PERSONAL_END = "# END Personal rules"
+
+
+def personal_rules() -> list[str]:
+    path = ROOT / "Rules/Personal.list"
+    return read_personal_routes(path.read_text(encoding="utf-8"), str(path))
+
+
+def personal_shadow_rules() -> list[str]:
+    return [PERSONAL_BEGIN, *personal_rules(), PERSONAL_END]
+
+
+def build_personal(*, update_shadow: bool = False) -> dict[Path, str]:
+    rules = personal_rules()
+    outputs = {ROOT / "Rules/Personal.clash.yaml": "rules:"
+               + ("\n" + "\n".join("  - " + json.dumps(rule, ensure_ascii=False)
+                                     for rule in rules) if rules else " []") + "\n"}
+    if update_shadow:
+        path = ROOT / "Shadowrocket/nodnsleak-pk.ini"
+        content = path.read_text(encoding="utf-8")
+        if content.count(PERSONAL_BEGIN) != 1 or content.count(PERSONAL_END) != 1:
+            raise ValueError(f"{path}: expected one personal rules block; run full generation")
+        before, rest = content.split(PERSONAL_BEGIN, 1)
+        _, after = rest.split(PERSONAL_END, 1)
+        outputs[path] = before + "\n".join(personal_shadow_rules()) + after
+    return outputs
 
 
 def build(revision: str | None = None) -> dict[Path, str]:
@@ -557,7 +576,10 @@ def build(revision: str | None = None) -> dict[Path, str]:
             converted = singbox_rule(rule, policy_name(group, "singbox"))
             if converted is not None:
                 singbox_rules.append(converted)
-        if relative == "BanProgramAD.list":
+        if relative == "LocalAreaNetwork.list":
+            if source_count != 0:
+                raise ValueError("LocalAreaNetwork rules must precede personal and custom rules")
+            shadow_rules.extend(personal_shadow_rules())
             for rule, custom_policy in custom:
                 if not rule.startswith("URL-REGEX,"):
                     clash_rules.append(rule.replace(",Proxy", f",{PROXY_GROUP}"))
@@ -567,10 +589,6 @@ def build(revision: str | None = None) -> dict[Path, str]:
                 converted = singbox_rule(rule, custom_policy)
                 if converted is not None:
                     singbox_rules.append(converted)
-            shadow_rules.extend([
-                "# Personal direct rules follow advertisement blocking",
-                "RULE-SET,https://raw.githubusercontent.com/ronigooja/ProxyRules/main/Rules/Personal.list,DIRECT",
-            ])
             personal_inserted = True
         source_count += 1
 
@@ -600,8 +618,9 @@ def build(revision: str | None = None) -> dict[Path, str]:
         rule["outbound"] for rule in packed_singbox_rules
         if any(field in rule for field in ("domain", "domain_suffix", "domain_keyword"))
     }
-    for index, group in enumerate(groups):
-        name = group["name"]
+    dns_outbound_names = [group["name"] for group in groups]
+    dns_outbound_names.extend(sorted(needed_dns_outbounds - set(dns_outbound_names) - {"direct", "block"}))
+    for index, name in enumerate(dns_outbound_names):
         if name in HIDDEN_GROUPS or name == FINAL_GROUP or name not in needed_dns_outbounds:
             continue
         tag = f"dns-outbound-{index:03d}"
@@ -658,16 +677,16 @@ def build(revision: str | None = None) -> dict[Path, str]:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--revision", help="Rebuild a specific ACL4SSR commit instead of updating rules")
-    parser.add_argument("--personal-only", action="store_true", help="Generate personal rule sets without downloading upstream rules")
+    parser.add_argument("--personal-only", action="store_true", help="Update personal Clash and Shadowrocket rules without downloading upstream rules")
     args = parser.parse_args()
     if args.personal_only and args.revision:
         parser.error("--personal-only cannot be combined with --revision")
-    outputs = build_personal() if args.personal_only else build(args.revision)
+    outputs = build_personal(update_shadow=True) if args.personal_only else build(args.revision)
     for path, content in outputs.items():
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(content, encoding="utf-8", newline="\n")
     if args.personal_only:
-        print("Generated personal Clash rule sets")
+        print("Generated personal Clash and Shadowrocket rules")
     else:
         print("Generated templates from ACL4SSR revision", outputs[ROOT / "Upstream/ACL4SSR-REVISION"].strip())
 
