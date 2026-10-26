@@ -1,1 +1,2 @@
-rules: []
+rules:
+  - "DOMAIN,ai.nodemgr.uk,DIRECT"

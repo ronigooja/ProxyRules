@@ -2,3 +2,5 @@
 # Personal rules shared by Nagi and Shadowrocket; excluded from XBoard templates.
 # Format: TYPE,value,node-or-policy-group[,no-resolve]
 # Use DIRECT for direct connections; named outbounds must exist in each client.
+
+DOMAIN,ai.nodemgr.uk,DIRECT
