@@ -1,6 +1,6 @@
 # NAME: Custom
-# 国内 AI 服务直连规则；并入 ACL4SSR 基础规则。
-# 格式：TYPE,value,DIRECT|REJECT|Proxy[,no-resolve]
+# Custom routing rules merged into the ACL4SSR base rules.
+# Format: TYPE,value,DIRECT|REJECT|Proxy|node-or-policy-group[,no-resolve]
 
 
 # ===== DeepSeek =====
@@ -73,3 +73,9 @@ DOMAIN-SUFFIX,youdao.com,DIRECT
 # ===== 搭建AI应用常见国内API =====
 DOMAIN-SUFFIX,volcengineapi.com,DIRECT
 DOMAIN-SUFFIX,tencentcloud.com,DIRECT
+
+# ===== GitHub =====
+DOMAIN,github.com,美国 HH01LA
+DOMAIN,api.github.com,美国 HH01LA
+DOMAIN-SUFFIX,githubusercontent.com,美国 HH01LA
+DOMAIN-SUFFIX,blob.core.windows.net,美国 HH01LA
