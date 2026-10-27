@@ -2,3 +2,18 @@
 # Personal rules shared by Nagi and Shadowrocket; excluded from XBoard templates.
 # Format: TYPE,value,node-or-policy-group[,no-resolve]
 # Use DIRECT for direct connections; named outbounds must exist in each client.
+
+# Applies when traffic targets these Japan exit addresses; route through 日本 SC01TY.
+IP-CIDR,136.0.11.159/32,日本 SC01TY,no-resolve
+IP-CIDR,45.45.217.235/32,日本 SC01TY,no-resolve
+IP-CIDR,154.19.187.117/32,日本 SC01TY,no-resolve
+IP-CIDR,70.39.178.189/32,日本 SC01TY,no-resolve
+
+# Applies when traffic targets these Hong Kong and Singapore scheduling addresses; route through 香港 VM02HK.
+IP-CIDR,38.47.101.8/32,香港 VM02HK,no-resolve
+IP-CIDR,64.118.131.42/32,香港 VM02HK,no-resolve
+IP-CIDR,64.118.141.231/32,香港 VM02HK,no-resolve
+IP-CIDR,64.118.141.232/32,香港 VM02HK,no-resolve
+
+# Applies when traffic targets this Seoul exit address; route through 首尔 EV01SL.
+IP-CIDR,50.114.114.252/32,首尔 EV01SL,no-resolve

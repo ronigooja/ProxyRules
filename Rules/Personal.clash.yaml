@@ -1,1 +1,10 @@
-rules: []
+rules:
+  - "IP-CIDR,136.0.11.159/32,日本 SC01TY,no-resolve"
+  - "IP-CIDR,45.45.217.235/32,日本 SC01TY,no-resolve"
+  - "IP-CIDR,154.19.187.117/32,日本 SC01TY,no-resolve"
+  - "IP-CIDR,70.39.178.189/32,日本 SC01TY,no-resolve"
+  - "IP-CIDR,38.47.101.8/32,香港 VM02HK,no-resolve"
+  - "IP-CIDR,64.118.131.42/32,香港 VM02HK,no-resolve"
+  - "IP-CIDR,64.118.141.231/32,香港 VM02HK,no-resolve"
+  - "IP-CIDR,64.118.141.232/32,香港 VM02HK,no-resolve"
+  - "IP-CIDR,50.114.114.252/32,首尔 EV01SL,no-resolve"
