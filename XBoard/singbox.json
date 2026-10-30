@@ -26,6 +26,12 @@
         "detour": "🚀 默认代理"
       },
       {
+        "tag": "dns-outbound-007",
+        "type": "https",
+        "server": "1.1.1.1",
+        "detour": "🇺🇸 美国地区"
+      },
+      {
         "tag": "dns-outbound-009",
         "type": "https",
         "server": "1.1.1.1",
@@ -114,12 +120,6 @@
         "type": "https",
         "server": "1.1.1.1",
         "detour": "🍃 应用净化"
-      },
-      {
-        "tag": "dns-outbound-028",
-        "type": "https",
-        "server": "1.1.1.1",
-        "detour": "美国 HH01LA"
       }
     ],
     "rules": [
@@ -212,14 +212,14 @@
           "github.com",
           "api.github.com"
         ],
-        "server": "dns-outbound-028"
+        "server": "dns-outbound-007"
       },
       {
         "domain_suffix": [
           "githubusercontent.com",
           "blob.core.windows.net"
         ],
-        "server": "dns-outbound-028"
+        "server": "dns-outbound-007"
       },
       {
         "domain": [
@@ -11289,14 +11289,14 @@
           "github.com",
           "api.github.com"
         ],
-        "outbound": "美国 HH01LA"
+        "outbound": "🇺🇸 美国地区"
       },
       {
         "domain_suffix": [
           "githubusercontent.com",
           "blob.core.windows.net"
         ],
-        "outbound": "美国 HH01LA"
+        "outbound": "🇺🇸 美国地区"
       },
       {
         "domain": [
