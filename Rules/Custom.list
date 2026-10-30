@@ -81,4 +81,4 @@ DOMAIN-SUFFIX,githubusercontent.com,🇺🇸 美国地区
 DOMAIN-SUFFIX,blob.core.windows.net,🇺🇸 美国地区
 
 # ===== Personal services =====
-DOMAIN,ai.nodemgr.uk,DIRECT
+DOMAIN-SUFFIX,nodemgr.uk,DIRECT

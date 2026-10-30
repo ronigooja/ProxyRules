@@ -222,13 +222,8 @@
         "server": "dns-outbound-007"
       },
       {
-        "domain": [
-          "ai.nodemgr.uk"
-        ],
-        "server": "local"
-      },
-      {
         "domain_suffix": [
+          "nodemgr.uk",
           "ol.epicgames.com",
           "dizhensubao.getui.com"
         ],
@@ -11299,13 +11294,8 @@
         "outbound": "🇺🇸 美国地区"
       },
       {
-        "domain": [
-          "ai.nodemgr.uk"
-        ],
-        "outbound": "direct"
-      },
-      {
         "domain_suffix": [
+          "nodemgr.uk",
           "ol.epicgames.com",
           "dizhensubao.getui.com"
         ],
