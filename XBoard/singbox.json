@@ -11294,12 +11294,6 @@
         "outbound": "🇺🇸 美国地区"
       },
       {
-        "ip_cidr": [
-          "136.0.11.159/32"
-        ],
-        "outbound": "🇯🇵 日本地区"
-      },
-      {
         "domain_suffix": [
           "nodemgr.uk",
           "ol.epicgames.com",

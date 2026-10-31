@@ -81,5 +81,4 @@ DOMAIN-SUFFIX,githubusercontent.com,🇺🇸 美国地区
 DOMAIN-SUFFIX,blob.core.windows.net,🇺🇸 美国地区
 
 # ===== Personal services =====
-IP-CIDR,136.0.11.159/32,🇯🇵 日本地区,no-resolve
 DOMAIN-SUFFIX,nodemgr.uk,DIRECT
