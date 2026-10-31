@@ -170,6 +170,7 @@ rules:
   - "DOMAIN,api.github.com,🇺🇸 美国地区"
   - "DOMAIN-SUFFIX,githubusercontent.com,🇺🇸 美国地区"
   - "DOMAIN-SUFFIX,blob.core.windows.net,🇺🇸 美国地区"
+  - "IP-CIDR,136.0.11.159/32,🇯🇵 日本地区,no-resolve"
   - "DOMAIN-SUFFIX,nodemgr.uk,DIRECT"
   - "DOMAIN-SUFFIX,ol.epicgames.com,DIRECT"
   - "DOMAIN-SUFFIX,dizhensubao.getui.com,DIRECT"
