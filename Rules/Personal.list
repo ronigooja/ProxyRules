@@ -4,7 +4,7 @@
 # Use DIRECT for direct connections; named outbounds must exist in each client.
 
 # Applies when traffic targets these Japan exit addresses; route through 🇯🇵 日本地区.
-IP-CIDR,136.0.11.159/32,🇯🇵 日本地区,no-resolve
+IP-CIDR,136.0.11.159/32,🇯🇵 日本地区
 IP-CIDR,45.45.217.235/32,🇯🇵 日本地区,no-resolve
 IP-CIDR,154.19.187.117/32,🇯🇵 日本地区,no-resolve
 IP-CIDR,70.39.178.189/32,🇯🇵 日本地区,no-resolve
