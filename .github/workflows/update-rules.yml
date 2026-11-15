@@ -48,7 +48,6 @@ jobs:
       fail-fast: false
       matrix:
         environment:
-          - xboarddev.nodemgr.uk
           - my.surabbit.com
     environment: ${{ matrix.environment }}
     steps:

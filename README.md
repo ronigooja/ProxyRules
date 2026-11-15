@@ -97,7 +97,7 @@ Stash、Surge 仍通过 DNS 服务器 IP 的规则指定查询出口，未实现
 | Variable | `XBOARD_API_URL` | 站点 HTTPS 根地址，不带 `/api` 路径 |
 | Variable | `XBOARD_ADMIN_PATH` | 站点管理路径，单个路径段 |
 
-工作流当前使用 `xboarddev.nodemgr.uk` 和 `my.surabbit.com` 两个 Environment。若某个值缺失，该站点的发布任务会明确失败，不会尝试空令牌请求。站点模板只会在内容变化时更新；生成或校验失败时不会调用任何站点 API。
+工作流当前使用 `my.surabbit.com` 一个 Environment。若某个值缺失，该站点的发布任务会明确失败，不会尝试空令牌请求。站点模板只会在内容变化时更新；生成或校验失败时不会调用任何站点 API。
 
 本地生成与校验：
 
