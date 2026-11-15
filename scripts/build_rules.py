@@ -29,11 +29,11 @@ REGION_FLAGS = {
     # The display marker is kept separate from node matching. Do not include
     # the unsupported Taiwan flag emoji in generated match expressions.
     "🇨🇳 台湾地区": "",
-    "🇸🇬 新加坡地区": "🇸🇬",
+    "🇸🇬 新马地区": "🇸🇬",
     "🇰🇷 韩国地区": "🇰🇷",
 }
 REGION_GROUPS = (
-    "🇭🇰 香港地区", "🇨🇳 台湾地区", "🇸🇬 新加坡地区",
+    "🇭🇰 香港地区", "🇨🇳 台湾地区", "🇸🇬 新马地区",
     "🇯🇵 日本地区", "🇺🇸 美国地区", "🇰🇷 韩国地区",
 )
 DISPLAY_FIRST = (PROXY_GROUP, AUTO_GROUP, MANUAL_GROUP, *REGION_GROUPS)
@@ -42,7 +42,7 @@ REJECT_GROUP = "🛑 全球拦截"
 FINAL_GROUP = "🐟 其他流量"
 APP_DEFAULTS = {
     "📲 电报消息": PROXY_GROUP,
-    "💬 Ai平台": "🇸🇬 新加坡地区",
+    "💬 Ai平台": "🇸🇬 新马地区",
     "📹 油管视频": "🇺🇸 美国地区",
     "🎥 奈飞视频": "🇺🇸 美国地区",
     "📺 巴哈姆特": "🇨🇳 台湾地区",
@@ -212,10 +212,10 @@ def rename_group(name: str) -> str:
         SOURCE_AUTO_GROUP: AUTO_GROUP,
         "🚀 模式选择": PROXY_GROUP,
         "🚀 默认出口": PROXY_GROUP,
-        "🇸🇬 狮城节点": "🇸🇬 新加坡地区",
+        "🇸🇬 狮城节点": "🇸🇬 新马地区",
         '🇭🇰 香港节点': '🇭🇰 香港地区',
         '🇨🇳 台湾节点': '🇨🇳 台湾地区',
-        '🇸🇬 新加坡节点': '🇸🇬 新加坡地区',
+        '🇸🇬 新加坡节点': '🇸🇬 新马地区',
         '🇯🇵 日本节点': '🇯🇵 日本地区',
         '🇺🇲 美国节点': '🇺🇸 美国地区',
         '🇰🇷 韩国节点': '🇰🇷 韩国地区',
@@ -272,6 +272,8 @@ def node_expression(group: dict) -> str | None:
     if not patterns:
         return None
     expression = "|".join(f"(?:{pattern})" for pattern in patterns)
+    if group["name"] == "🇸🇬 新马地区":
+        expression += "|(?:马来|马来西亚|吉隆坡|Malaysia|🇲🇾)"
     if group["name"] in REGION_FLAGS and REGION_FLAGS[group["name"]]:
         expression += "|(?:" + REGION_FLAGS[group["name"]] + ")"
     if "~" in expression:

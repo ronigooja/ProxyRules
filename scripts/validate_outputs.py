@@ -54,6 +54,11 @@ assert len(hong_kong) == 2 and hong_kong[0].startswith("~") and hong_kong[0].end
 assert re.search(hong_kong[0][1:-2], "Hong Kong 01")
 assert re.search(hong_kong[0][1:-2], "🇭🇰 01")
 assert not re.search(hong_kong[0][1:-2], "Japan 01")
+singapore_malaysia = groups["🇸🇬 新马地区"]["proxies"][0][1:-2]
+for keyword in ("马来", "马来西亚", "吉隆坡", "Malaysia", "🇲🇾"):
+    assert keyword in singapore_malaysia
+    assert re.search(singapore_malaysia, keyword)
+assert "~" not in singapore_malaysia
 for name in REGION_GROUPS:
     assert groups[name]["proxies"][-1] == "REJECT"
 assert REMOVED_GROUP not in groups
