@@ -61,7 +61,7 @@ FIXED_DIRECT_GROUPS = {"🌏 国内媒体", "🎶 网易音乐"}
 HIDDEN_GROUPS = {DIRECT_GROUP, REJECT_GROUP, *FIXED_DIRECT_GROUPS}
 RULE_TYPES = {
     "DOMAIN", "DOMAIN-SUFFIX", "DOMAIN-KEYWORD", "IP-CIDR", "IP-CIDR6",
-    "PROCESS-NAME", "URL-REGEX",
+    "PROCESS-NAME", "PROCESS-NAME-REGEX", "URL-REGEX",
 }
 
 
@@ -119,6 +119,8 @@ def singbox_rule(rule: str, policy: str) -> dict | None:
         "IP-CIDR": "ip_cidr",
         "IP-CIDR6": "ip_cidr",
         "PROCESS-NAME": "process_name",
+        # Filename-only regexes also match the final component of a full path.
+        "PROCESS-NAME-REGEX": "process_path_regex",
     }.get(kind)
     if field is None:  # URL-REGEX has no sing-box route rule equivalent.
         return None
@@ -571,10 +573,11 @@ def build(revision: str | None = None) -> dict[Path, str]:
             # Clash does not support Surge's URL-REGEX rule type.
             if not rule.startswith("URL-REGEX,"):
                 clash_rules.append(transformed)
-            if not rule.startswith("URL-REGEX,"):
+            if not rule.startswith(("URL-REGEX,", "PROCESS-NAME-REGEX,")):
                 surfboard_rules.append(transformed)
-            surge_rules.append(transformed)
-            shadow_rules.append(with_policy(rule, shadow_policies[group]))
+            if not rule.startswith("PROCESS-NAME-REGEX,"):
+                surge_rules.append(transformed)
+                shadow_rules.append(with_policy(rule, shadow_policies[group]))
             converted = singbox_rule(rule, policy_name(group, "singbox"))
             if converted is not None:
                 singbox_rules.append(converted)
@@ -585,9 +588,11 @@ def build(revision: str | None = None) -> dict[Path, str]:
             for rule, custom_policy in custom:
                 if not rule.startswith("URL-REGEX,"):
                     clash_rules.append(rule.replace(",Proxy", f",{PROXY_GROUP}"))
+                if not rule.startswith(("URL-REGEX,", "PROCESS-NAME-REGEX,")):
                     surfboard_rules.append(rule.replace(",Proxy", f",{PROXY_GROUP}"))
-                surge_rules.append(rule.replace(",Proxy", f",{PROXY_GROUP}"))
-                shadow_rules.append(rule.replace(",Proxy", ",PROXY"))
+                if not rule.startswith("PROCESS-NAME-REGEX,"):
+                    surge_rules.append(rule.replace(",Proxy", f",{PROXY_GROUP}"))
+                    shadow_rules.append(rule.replace(",Proxy", ",PROXY"))
                 converted = singbox_rule(rule, custom_policy)
                 if converted is not None:
                     singbox_rules.append(converted)
@@ -657,7 +662,7 @@ def build(revision: str | None = None) -> dict[Path, str]:
             f"IP-CIDR,8.8.8.8/32,{AUTO_GROUP}",
             "IP-CIDR,1.12.12.12/32,DIRECT",
             "IP-CIDR,120.53.53.53/32,DIRECT",
-        ] + clash_rules) + "\n"
+        ] + [rule for rule in clash_rules if not rule.startswith("PROCESS-NAME-REGEX,")]) + "\n"
     surge = (surge_base.replace("{{PROXY_GROUPS}}", surge_proxy_groups(groups))
              .replace("{{DNS_HOSTS}}", "\n".join(surge_dns_hosts(surge_rules)))
              + "\n".join(surge_rules) + "\n")

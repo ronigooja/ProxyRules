@@ -81,6 +81,8 @@ DOMAIN-SUFFIX,githubusercontent.com,🇺🇸 美国地区
 DOMAIN-SUFFIX,blob.core.windows.net,🇺🇸 美国地区
 
 # ===== Binance website, APIs, WebSocket, and supporting services =====
+# Process regex applies to Mihomo and sing-box; other clients retain domain rules.
+PROCESS-NAME-REGEX,(?i)[^/\\]*binance[^/\\]*$,🇯🇵 日本地区
 DOMAIN-SUFFIX,binance.com,🇯🇵 日本地区
 DOMAIN-SUFFIX,binance.cloud,🇯🇵 日本地区
 DOMAIN-SUFFIX,binance.me,🇯🇵 日本地区

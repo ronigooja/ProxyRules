@@ -11321,6 +11321,12 @@
         "outbound": "🇺🇸 美国地区"
       },
       {
+        "process_path_regex": [
+          "(?i)[^/\\\\]*binance[^/\\\\]*$"
+        ],
+        "outbound": "🇯🇵 日本地区"
+      },
+      {
         "domain_suffix": [
           "binance.com",
           "binance.cloud",

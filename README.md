@@ -114,6 +114,8 @@ python3 scripts/validate_outputs.py
 
 ### Rule priority
 
+For Binance desktop traffic, Mihomo-based Clash/Clash Meta templates match executable names containing `binance`, case-insensitively, and route them through `🇯🇵 日本地区`. Sing-box applies the same filename pattern to the last component of the process path. Process detection must be available in the client. Stash, Surge, Surfboard, and Shadowrocket omit this regex rule and retain domain-based routing. When adding `PROCESS-NAME-REGEX` source rules, use filename-only patterns that cannot cross `/` or `\` separators and end with `$`, because sing-box evaluates full paths. Process matching does not add process-aware DNS policies or guarantee same-node DNS egress.
+
 Rules use the first matching entry. Generation places local network rules first, followed by personal rules (Shadowrocket only), custom rules, the upstream direct whitelist (`UnBan.list`), advertisement blocking (`BanAD.list`), application filtering (`BanProgramAD.list`), remaining upstream categories in their original order, and the final fallback. Personal rules therefore override custom rules in Shadowrocket, and both override the upstream whitelist and filtering. XBoard templates exclude personal rules. Nagi imports `Personal.clash.yaml` separately; its client controls where imported rules appear.
 
 Existing client-specific DNS endpoint routes are separate from this ordering. Shadowrocket still uses its fixed DNS endpoint routes; this priority change does not implement DNS routing through each business rule's selected node.

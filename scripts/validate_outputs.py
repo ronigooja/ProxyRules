@@ -97,7 +97,7 @@ assert groups[auto_group]["interval"] > 0
 assert groups[auto_group]["tolerance"] >= 0
 assert isinstance(clash.get("rules"), list) and len(clash["rules"]) > 1000
 assert {key: value for key, value in stash.items() if key not in ("dns", "rules")} == {key: value for key, value in clash.items() if key not in ("dns", "rules", "rule-providers")}
-assert stash["rules"][4:] == clash["rules"]
+assert stash["rules"][4:] == [rule for rule in clash["rules"] if not rule.startswith("PROCESS-NAME-REGEX,")]
 assert stash["rules"][:4] == [
     f"IP-CIDR,1.1.1.1/32,{AUTO_GROUP}",
     f"IP-CIDR,8.8.8.8/32,{AUTO_GROUP}",
@@ -142,6 +142,9 @@ assert len(personal["rules"]) == len(set(personal["rules"]))
 assert personal["rules"] == personal_rules
 for rule_set in (clash["rules"], stash["rules"]):
     for rule, _ in custom:
+        if rule_set is stash["rules"] and rule.startswith("PROCESS-NAME-REGEX,"):
+            assert rule not in rule_set
+            continue
         if not rule.startswith("URL-REGEX,"):
             rendered = rule.replace(",Proxy", f",{PROXY_GROUP}")
             assert rule_set.index("DOMAIN-SUFFIX,wifi.cmcc,DIRECT") < rule_set.index(rendered) < rule_set.index("DOMAIN-SUFFIX,ol.epicgames.com,DIRECT")
@@ -251,6 +254,9 @@ for content in (surge, surfboard):
         assert ", REJECT, url=" in line
 for content in (surge, surfboard, shadow):
     for rule, _ in custom:
+        if rule.startswith("PROCESS-NAME-REGEX,"):
+            assert rule not in content
+            continue
         if content is surfboard and rule.startswith("URL-REGEX,"):
             continue
         rendered = rule.replace(",Proxy", ",PROXY" if content is shadow else f",{PROXY_GROUP}")
@@ -273,6 +279,8 @@ assert "RULE-SET,https://raw.githubusercontent.com/ronigooja/ProxyRules/main/Rul
 assert shadow.index("DOMAIN-SUFFIX,wifi.cmcc,DIRECT") < shadow.index(PERSONAL_BEGIN)
 assert shadow.index(PERSONAL_END) < shadow.index("DOMAIN-SUFFIX,ol.epicgames.com,DIRECT")
 for rule, _ in custom:
+    if rule.startswith("PROCESS-NAME-REGEX,"):
+        continue
     assert shadow.index(PERSONAL_END) < shadow.index(rule.replace(",Proxy", ",PROXY"))
 assert shadow.index("FINAL,PROXY") < shadow.index("[Host]")
 

@@ -1,11 +1,12 @@
 """Regression checks for DNS routing priority and per-application bindings."""
 
 import sys
+import re
 import unittest
 from urllib.parse import urlsplit
 
 sys.dont_write_bytecode = True
-from build_rules import clash_dns_policies, singbox_dns_rules
+from build_rules import ROOT, read_custom_rules, singbox_rule, clash_dns_policies, singbox_dns_rules
 
 
 def matches(rule: str, domain: str) -> bool:
@@ -48,6 +49,25 @@ class ClashDNSPolicies(unittest.TestCase):
     def test_keyword_priority_is_preserved(self):
         rules = ["DOMAIN-KEYWORD,video,Video", "DOMAIN-SUFFIX,example,DIRECT"]
         self.assertEqual({policy for _, policy in self.resolve_policy(rules, "video.example")}, {"Video"})
+
+
+class BinanceProcessRules(unittest.TestCase):
+    def test_case_insensitive_filename_keyword(self):
+        rules = read_custom_rules((ROOT / "Rules/Custom.list").read_text(), "Custom.list")
+        rule, policy = next((rule, policy) for rule, policy in rules
+                            if rule.startswith("PROCESS-NAME-REGEX,"))
+        self.assertEqual(policy, "🇯🇵 日本地区")
+        pattern = rule.split(",")[1]
+        for name in ("Binance", "Binance Helper", "BINANCE.EXE", "my-binance-helper"):
+            self.assertRegex(name, pattern)
+            self.assertRegex("/Applications/Binance.app/Contents/MacOS/" + name, pattern)
+            self.assertRegex("C:\\Apps\\" + name, pattern)
+        for name in ("Chrome", "/Applications/Binance.app/Contents/MacOS/Other",
+                     "C:\\Binance\\Other.exe"):
+            self.assertIsNone(re.search(pattern, name))
+        converted = singbox_rule(rule, policy)
+        self.assertEqual(converted, {"process_path_regex": [pattern], "outbound": policy})
+        self.assertEqual(singbox_dns_rules([converted], {}), [])
 
 
 class SingBoxDNSPolicies(unittest.TestCase):
