@@ -80,5 +80,23 @@ DOMAIN,api.github.com,🇺🇸 美国地区
 DOMAIN-SUFFIX,githubusercontent.com,🇺🇸 美国地区
 DOMAIN-SUFFIX,blob.core.windows.net,🇺🇸 美国地区
 
+# ===== Binance website, APIs, WebSocket, and supporting services =====
+DOMAIN-SUFFIX,binance.com,🇯🇵 日本地区
+DOMAIN-SUFFIX,binance.cloud,🇯🇵 日本地区
+DOMAIN-SUFFIX,binance.me,🇯🇵 日本地区
+DOMAIN-SUFFIX,binance.org,🇯🇵 日本地区
+DOMAIN-SUFFIX,binance.us,🇯🇵 日本地区
+DOMAIN-SUFFIX,binance.vision,🇯🇵 日本地区
+DOMAIN-SUFFIX,binancecnt.com,🇯🇵 日本地区
+DOMAIN-SUFFIX,binancefuture.com,🇯🇵 日本地区
+DOMAIN-SUFFIX,binancezh.cc,🇯🇵 日本地区
+DOMAIN-SUFFIX,bnappzh.co,🇯🇵 日本地区
+DOMAIN-SUFFIX,bnbstatic.com,🇯🇵 日本地区
+DOMAIN-SUFFIX,bnbzh.ac,🇯🇵 日本地区
+DOMAIN-SUFFIX,bntrace.com,🇯🇵 日本地区
+DOMAIN-SUFFIX,poolbinance.com,🇯🇵 日本地区
+DOMAIN-SUFFIX,saasexch.cc,🇯🇵 日本地区
+DOMAIN-SUFFIX,saasexch.com,🇯🇵 日本地区
+
 # ===== Personal services =====
 DOMAIN-SUFFIX,nodemgr.uk,DIRECT

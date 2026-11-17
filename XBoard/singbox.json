@@ -26,6 +26,12 @@
         "detour": "🚀 默认代理"
       },
       {
+        "tag": "dns-outbound-006",
+        "type": "https",
+        "server": "1.1.1.1",
+        "detour": "🇯🇵 日本地区"
+      },
+      {
         "tag": "dns-outbound-007",
         "type": "https",
         "server": "1.1.1.1",
@@ -220,6 +226,27 @@
           "blob.core.windows.net"
         ],
         "server": "dns-outbound-007"
+      },
+      {
+        "domain_suffix": [
+          "binance.com",
+          "binance.cloud",
+          "binance.me",
+          "binance.org",
+          "binance.us",
+          "binance.vision",
+          "binancecnt.com",
+          "binancefuture.com",
+          "binancezh.cc",
+          "bnappzh.co",
+          "bnbstatic.com",
+          "bnbzh.ac",
+          "bntrace.com",
+          "poolbinance.com",
+          "saasexch.cc",
+          "saasexch.com"
+        ],
+        "server": "dns-outbound-006"
       },
       {
         "domain_suffix": [
@@ -11292,6 +11319,27 @@
           "blob.core.windows.net"
         ],
         "outbound": "🇺🇸 美国地区"
+      },
+      {
+        "domain_suffix": [
+          "binance.com",
+          "binance.cloud",
+          "binance.me",
+          "binance.org",
+          "binance.us",
+          "binance.vision",
+          "binancecnt.com",
+          "binancefuture.com",
+          "binancezh.cc",
+          "bnappzh.co",
+          "bnbstatic.com",
+          "bnbzh.ac",
+          "bntrace.com",
+          "poolbinance.com",
+          "saasexch.cc",
+          "saasexch.com"
+        ],
+        "outbound": "🇯🇵 日本地区"
       },
       {
         "domain_suffix": [
